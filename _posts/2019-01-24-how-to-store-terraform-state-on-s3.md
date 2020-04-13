@@ -3,7 +3,7 @@ layout: post
 title: How to Store Terraform State on S3 and Cloud
 date: 2019-01-24 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-store-terraform-state-on-s3
+permalink: /@marcus/how-to-store-terraform-state-on-s3/
 ---
 
 Terraform is an amazing tool that allows you to keep track on the state of the infrastructure that is running at your Cloud Provider, and it uses this state to understand if it needs to update, tear down or provision new instances of the different pieces of your infrastructure.

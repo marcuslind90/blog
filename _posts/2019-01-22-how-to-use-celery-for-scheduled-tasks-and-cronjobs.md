@@ -3,7 +3,7 @@ layout: post
 title: How to use Celery for Scheduled Tasks and Cronjobs
 date: 2019-01-22 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-use-celery-for-scheduled-tasks-and-cronjobs
+permalink: /@marcus/how-to-use-celery-for-scheduled-tasks-and-cronjobs/
 ---
 
 A very common, reoccurring thing that developers want to create is a feature that occurs over and over again on a certain schedule. This could be things like emailing out notifications at certain intervals, clearing some data from the database, deleting log files on the system or maybe just prepare data by conducting some heavy task in the middle of the night so it can be consumed in the morning by the users.

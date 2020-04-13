@@ -3,7 +3,7 @@ layout: post
 title: How to use The 12 Factor App Methodology in Practice
 date: 2019-01-18 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-use-the-12-factor-app-methodology-in-practice
+permalink: /@marcus/how-to-use-the-12-factor-app-methodology-in-practice/
 ---
 
 How do you build an application that is easy to deploy to the cloud, easy to scale, secure and a breeze to work with as a developer? It's a question that should be in our heads for every new project we work on, since we should always aspire to produce high quality work that can take a business to the next level. 

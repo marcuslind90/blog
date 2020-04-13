@@ -3,7 +3,7 @@ layout: post
 title: How to Automatically Retry Failed Tasks with Celery
 date: 2019-03-14 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-automatically-retry-failed-tasks-with-celery
+permalink: /@marcus/how-to-automatically-retry-failed-tasks-with-celery/
 ---
 
 Stability of your asynchronous background tasks is crucial for your system design. When you move the work of processing from the main application and instead leverage something like Celery, to execute the work in the background, it's important that you can feel confident that those tasks get executed correctly without you having to babysit it and wait for the results.

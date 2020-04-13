@@ -3,7 +3,7 @@ layout: post
 title: Code Review Best Practices While Not Being an Ass
 date: 2019-02-28 00:00:00 +0000
 categories: docker
-permalink: /@marcus/code-review-best-practices-while-not-being-an-ass
+permalink: /@marcus/code-review-best-practices-while-not-being-an-ass/
 ---
 
 Personally, I feel that code reviews have been one of the key tools in my toolbox that have helped me develop the most within the past few years. 

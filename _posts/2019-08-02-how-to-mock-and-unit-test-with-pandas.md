@@ -3,7 +3,7 @@ layout: post
 title: How to Write Unit Tests and Mock with Pandas
 date: 2019-08-02 00:00:00 +0000
 categories: python tests pandas
-permalink: /@marcus/how-to-mock-and-unit-test-with-pandas
+permalink: /@marcus/how-to-mock-and-unit-test-with-pandas/
 ---
 
 

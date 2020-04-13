@@ -3,7 +3,7 @@ layout: post
 title: TopTal Review - My First Year as a TopTal Freelancer
 date: 2019-06-28 00:00:00 +0000
 categories: docker
-permalink: /@marcus/toptal-review-my-first-year-as-a-toptal-freelancer
+permalink: /@marcus/toptal-review-my-first-year-as-a-toptal-freelancer/
 ---
 
 A little more than 1 year ago I decided to apply to become a freelancer with the exclusive freelance platform [TopTal](https://www.toptal.com/#assume-solely-masterly-it-engineers). They claim to only recruit the Top 3% of talent and it's definitely the crème de la crème within its category and the platform that many freelancers aspire to join.

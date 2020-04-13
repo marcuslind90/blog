@@ -3,7 +3,7 @@ layout: post
 title: How to Add Social Authentication to Django
 date: 2019-01-18 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-add-social-authentication-to-django
+permalink: /@marcus/how-to-add-social-authentication-to-django/
 ---
 
 No matter what type of website your building these days, if you require some kind of authentication there is probably some kind of service or social network out there that would be a good fit for you and your application and that you could leverage for authentication and registration.

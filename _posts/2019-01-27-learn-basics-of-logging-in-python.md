@@ -3,7 +3,7 @@ layout: post
 title: Learn Basics of Logging in Python
 date: 2019-01-27 00:00:00 +0000
 categories: docker
-permalink: /@marcus/learn-basics-of-logging-in-python
+permalink: /@marcus/learn-basics-of-logging-in-python/
 ---
 
 The Python logging module is in the core of things that you need to learn to master the Python programming language. By using logging extensively throughout your program, you will not only massively improve your ability to debug reported errors, but you'll also get great insights into how your users are interacting with your application.

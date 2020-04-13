@@ -3,7 +3,7 @@ layout: post
 title: 6.8 Times Faster with Django Performance Optimization
 date: 2019-02-27 00:00:00 +0000
 categories: docker
-permalink: /@marcus/68-times-faster-with-django-performance-optimization
+permalink: /@marcus/68-times-faster-with-django-performance-optimization/
 ---
 
 Scaling Django in production to be able to serve your application to thousands of visitors is one of the most popular topics that people wonder and ask about within the Django community. I can't even count the times I've seen people ask questions related to this within Facebook groups, StackOverflow and other discussion forums.

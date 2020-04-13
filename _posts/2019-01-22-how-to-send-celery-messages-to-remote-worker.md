@@ -3,7 +3,7 @@ layout: post
 title: How to Send Celery Messages to Remote Worker
 date: 2019-01-22 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-send-celery-messages-to-remote-worker
+permalink: /@marcus/how-to-send-celery-messages-to-remote-worker/
 ---
 
 When you're setting up a distributed system where there are multiple different applications and services that communicate with each other, you can choose to handle this communication in a few different ways.

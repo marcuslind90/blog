@@ -3,7 +3,7 @@ layout: post
 title: Django's Class Based Views vs Function Based Views
 date: 2019-02-01 00:00:00 +0000
 categories: docker
-permalink: /@marcus/djangos-class-based-views-vs-function-based-views
+permalink: /@marcus/djangos-class-based-views-vs-function-based-views/
 ---
 
 As a Web Framework, one of the main uses for Django is to serve HTTP Responses back to the client that is visiting the website. This is done through what Django calls "Views". A View is simply just a callable that returns a `HTTPResponse`.

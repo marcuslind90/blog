@@ -3,7 +3,7 @@ layout: post
 title: How to Create a Hash Table From Scratch in Python
 date: 2019-01-21 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-create-a-hash-table-from-scratch-in-python
+permalink: /@marcus/how-to-create-a-hash-table-from-scratch-in-python/
 ---
 
 A Hash Table is one of the core data structures that you need to have a good understanding of as a Software Engineer. Unlike some other data structures that are rarely used in real life situations, Hash Tables are used all the time.

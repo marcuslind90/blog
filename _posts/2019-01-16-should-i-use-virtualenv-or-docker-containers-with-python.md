@@ -3,7 +3,7 @@ layout: post
 title: Should I use virtualenv or Docker containers with Python?
 date: 2019-01-16 00:00:00 +0000
 categories: docker
-permalink: /@marcus/should-i-use-virtualenv-or-docker-containers-with-python
+permalink: /@marcus/should-i-use-virtualenv-or-docker-containers-with-python/
 ---
 
 What if you have two different projects on your machine that require two different versions of the same package with python? Normally in languages such as NodeJS or PHP this is not a problem you just write `npm install --save <package>` and it will install it in the `node_modules/` directory in your project folder, but can the same thing be done with Python?

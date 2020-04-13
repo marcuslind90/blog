@@ -3,7 +3,7 @@ layout: post
 title: How to replicate PostgreSQL Database as Master/Slave
 date: 2019-01-17 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-replicate-postgresql-database-as-masterslave
+permalink: /@marcus/how-to-replicate-postgresql-database-as-masterslave/
 ---
 
 Most websites out there perform fine by simply having a web server instance and a database server instance, but if you are one of the lucky few who manage to get real traction to your business and start attracting serious number of visitors, you'll quite quickly run into your first bottleneck, your database.

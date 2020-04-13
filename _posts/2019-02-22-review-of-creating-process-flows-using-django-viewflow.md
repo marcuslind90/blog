@@ -3,7 +3,7 @@ layout: post
 title: Review of Creating Process Flows using Django Viewflow
 date: 2019-02-22 00:00:00 +0000
 categories: docker
-permalink: /@marcus/review-of-creating-process-flows-using-django-viewflow
+permalink: /@marcus/review-of-creating-process-flows-using-django-viewflow/
 ---
 
 During the last few months, I've been working on a project for one of the largest retailers in the world where we use machine learning and data science to help them predict future sales.

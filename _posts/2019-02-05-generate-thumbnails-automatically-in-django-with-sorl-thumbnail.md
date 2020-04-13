@@ -3,7 +3,7 @@ layout: post
 title: Generate Thumbnails Automatically in Django with sorl-thumbnail
 date: 2019-02-05 00:00:00 +0000
 categories: docker
-permalink: /@marcus/generate-thumbnails-automatically-in-django-with-sorl-thumbnail
+permalink: /@marcus/generate-thumbnails-automatically-in-django-with-sorl-thumbnail/
 ---
 
 Generating thumbnails for your media content that is in the correct size, and optimized for the web by stripping any additional metadata away from them, is one of the main things that you will be recommended to do if you want to improve your websites load speed.

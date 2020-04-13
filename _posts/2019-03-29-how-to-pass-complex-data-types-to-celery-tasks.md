@@ -3,7 +3,7 @@ layout: post
 title: How to Pass Complex Data Types to Celery Tasks
 date: 2019-03-29 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-pass-complex-data-types-to-celery-tasks
+permalink: /@marcus/how-to-pass-complex-data-types-to-celery-tasks/
 ---
 
 Sometimes some of our favorite tools make things so simple for us by abstracting away so much of the technical implementations, that we lose track of what is actually going on behind the scenes, which cause us to accidentally implement things incorrectly and have unintended bugs within our code.

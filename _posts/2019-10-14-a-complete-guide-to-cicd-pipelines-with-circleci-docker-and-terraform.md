@@ -3,7 +3,7 @@ layout: post
 title: A complete guide to CI/CD Pipelines with CircleCI, Docker and Terraform
 date: 2019-10-14 00:00:00 +0000
 categories: circleci docker terraform devops
-permalink: /@marcus/a-complete-guide-to-cicd-pipelines-with-circleci-docker-and-terraform
+permalink: /@marcus/a-complete-guide-to-cicd-pipelines-with-circleci-docker-and-terraform/
 ---
 
 Setting up a Continuous Integration and Continuous Delivery pipeline has become something that every project requires from the start these days to enforce high-quality code. I see it in all kinds of projects no matter if it's for the web, data science, machine learning and so on.

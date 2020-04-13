@@ -3,7 +3,7 @@ layout: post
 title: How to Optimize Docker Images for Smaller Size?
 date: 2019-07-31 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-optimize-docker-images-for-smaller-size-and-speed
+permalink: /@marcus/how-to-optimize-docker-images-for-smaller-size-and-speed/
 ---
 
 Docker is one of those rare technologies that completely rock your world when you understand the benefits and usages of it. It is definitely the number one technology that I appreciate getting into the last few years, and these days I use it in every single Software Engineering project that I get into.

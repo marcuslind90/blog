@@ -3,7 +3,7 @@ layout: post
 title: Generate Python Unit Test & Flake8 Reports for JUnit
 date: 2019-08-02 00:00:00 +0000
 categories: python tests flake8
-permalink: /@marcus/generate-python-unit-test-flake8-reports-for-junit
+permalink: /@marcus/generate-python-unit-test-flake8-reports-for-junit/
 ---
 
 One of the core parts of your Continuous Integration Pipeline (CI) is often to generate reports that detail the status of unit tests, their coverage and reports covering the static analysis of the codebase.

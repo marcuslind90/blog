@@ -3,7 +3,7 @@ layout: post
 title: How to Render Markdown Syntax as HTML Using Python
 date: 2019-01-29 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-render-markdown-syntax-as-html-using-python
+permalink: /@marcus/how-to-render-markdown-syntax-as-html-using-python/
 ---
 
 Storing user-created articles in your database as Markdown Syntax instead of the final rendered HTML solves so many problems. It's not only more secure and helps you prevent XSS injections into your content, but it also makes it much more flexible to change the rendered version of the content at a later stage in the lifetime of your application.

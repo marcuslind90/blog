@@ -3,7 +3,7 @@ layout: post
 title: Deep Dive Guide Into Python Type Hints and Type Checks
 date: 2019-01-30 00:00:00 +0000
 categories: docker
-permalink: /@marcus/deep-dive-guide-into-python-type-hints-and-type-checks.md
+permalink: /@marcus/deep-dive-guide-into-python-type-hints-and-type-checks/
 ---
 
 In 2012 a Finnish Ph.D. student from Cambridge named Jukka Lehtosalo approached the author of Python Guido van Rossum at a PyCon event regarding a new programming language named [Alore](http://www.alorelang.org/) that he had created which was heavily inspired by Python, but with the addition that it also supported optional type annotations.

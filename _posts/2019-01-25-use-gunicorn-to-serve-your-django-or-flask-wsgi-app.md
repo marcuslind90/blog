@@ -3,7 +3,7 @@ layout: post
 title: Use Gunicorn To Serve Your Django or Flask WSGI App
 date: 2019-01-25 00:00:00 +0000
 categories: docker
-permalink: /@marcus/use-gunicorn-to-serve-your-django-or-flask-wsgi-app
+permalink: /@marcus/use-gunicorn-to-serve-your-django-or-flask-wsgi-app/
 ---
 
 Using Gunicorn to serve your python WSGI web application is the next step to take after you've finally spent those days creating the first prototype of your new application and you're ready to serve it in production. 

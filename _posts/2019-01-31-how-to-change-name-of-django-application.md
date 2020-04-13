@@ -3,7 +3,7 @@ layout: post
 title: How to Change Name of Django Application
 date: 2019-01-31 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-change-name-of-django-application
+permalink: /@marcus/how-to-change-name-of-django-application/
 ---
 
 Updating the name of an existing Django App is easier said than done. After you've renamed your folder name you will instantly be met with errors and different issues that result from dependencies to the old app name.

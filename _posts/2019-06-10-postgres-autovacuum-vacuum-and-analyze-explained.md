@@ -3,7 +3,7 @@ layout: post
 title: Postgres Autovacuum, Vacuum and Analyze Explained
 date: 2019-06-10 00:00:00 +0000
 categories: docker
-permalink: /@marcus/postgres-autovacuum-vacuum-and-analyze-explained
+permalink: /@marcus/postgres-autovacuum-vacuum-and-analyze-explained/
 ---
 
 This week I ran into something interesting on the current project that I'm working on. In the project, we have a PostgreSQL datamart where we store a ton of data generated from a machine learning model.

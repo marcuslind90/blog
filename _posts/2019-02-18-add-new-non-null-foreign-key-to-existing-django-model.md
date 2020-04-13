@@ -3,7 +3,7 @@ layout: post
 title: Add New Non-Null Foreign Key to Existing Django Model
 date: 2019-02-18 00:00:00 +0000
 categories: docker
-permalink: /@marcus/add-new-non-null-foreign-key-to-existing-django-model
+permalink: /@marcus/add-new-non-null-foreign-key-to-existing-django-model/
 ---
 
 Did you ever attempt to add a new non-nullable ForeignKey field to an existing Django model? If you did, you were probably prompted to add a default value that existing data should use for the new Foreign Key. But what value should this be? How do you automatically set it to the right value?

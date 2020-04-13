@@ -3,7 +3,7 @@ layout: post
 title: Why you should use Docker - A Complete Guide
 date: 2019-07-31 00:00:00 +0000
 categories: docker
-permalink: /@marcus/why-you-should-use-docker-a-complete-guide
+permalink: /@marcus/why-you-should-use-docker-a-complete-guide/
 ---
 
 Getting your docker image built and running is a great achievement by itself, but the world of Docker does not simply stop there. There are still plenty of useful things to learn and dig your teeth into when it comes to Docker, especially when it comes to optimizing your image.

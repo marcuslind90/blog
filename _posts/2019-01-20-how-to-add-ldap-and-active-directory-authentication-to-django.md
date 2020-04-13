@@ -3,7 +3,7 @@ layout: post
 title: How to add LDAP & Active Directory Authentication to Django
 date: 2019-01-20 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-add-ldap-and-active-directory-authentication-to-django
+permalink: /@marcus/how-to-add-ldap-and-active-directory-authentication-to-django/
 ---
 
 You know that you're working for an Enterprise business when you're asked to integrate their website's authentication with their Active Directory server. If you have no idea what Active Directory is, don't worry it probably just means that you're living within the StartUp bubble of web development!

@@ -3,7 +3,7 @@ layout: post
 title: How to restrict access with Django Permissions
 date: 2019-01-16 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-restrict-access-with-django-permissions
+permalink: /@marcus/how-to-restrict-access-with-django-permissions/
 ---
 
 Django has a very potent permission system that allow you to customize the access to different resources and views for each user depending on which group the user belong to, which permissions the user have, or by which specific objects the user should have access to.
@@ -205,4 +205,3 @@ Personally I like to assign the permission with a Django Signal, which means tha
 			instance.user,  # The user object.
 			instance  # The object we want to assign the permission to.
 		)
-        

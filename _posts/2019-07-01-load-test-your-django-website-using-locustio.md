@@ -3,7 +3,7 @@ layout: post
 title: Load Test Your Django Website Using LocustIO
 date: 2019-07-01 00:00:00 +0000
 categories: docker
-permalink: /@marcus/load-test-your-django-website-using-locustio
+permalink: /@marcus/load-test-your-django-website-using-locustio/
 ---
 
 For the past year, I've been working on a project where I've been building a web product for one of the largest retailers in the world. The website itself is a private tool used internally by the company, but with over 100'000+ employees even an internal tool could receive a significant amount of user requests.

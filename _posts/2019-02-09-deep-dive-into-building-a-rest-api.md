@@ -3,7 +3,7 @@ layout: post
 title: Deep Dive into Building a REST API The Correct Way
 date: 2019-02-09 00:00:00 +0000
 categories: docker
-permalink: /@marcus/deep-dive-into-building-a-rest-api
+permalink: /@marcus/deep-dive-into-building-a-rest-api/
 ---
 
 RESTful API's are one of the main design patterns that you choose between when you're setting up a new API for your application. The term gets thrown around a lot, and unfortunately many API's ends up becoming some kind of mix of multiple patterns that are half-way implemented due to lack of understanding on what REST actually is.

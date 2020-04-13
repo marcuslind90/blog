@@ -3,7 +3,7 @@ layout: post
 title: Deep Dive into Python Mixins and Multiple Inheritance
 date: 2019-02-07 00:00:00 +0000
 categories: docker
-permalink: /@marcus/deep-dive-into-python-mixins-and-multiple-inheritance
+permalink: /@marcus/deep-dive-into-python-mixins-and-multiple-inheritance/
 ---
 
 In my opinion, Mixins is one of the most powerful, and useful features introduced in object-oriented python programming. It allows you to compose your classes in unique and reusable ways that simplify your code and in turn also helps you avoid repeating yourself when programming.

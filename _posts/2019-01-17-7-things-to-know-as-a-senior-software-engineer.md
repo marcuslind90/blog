@@ -3,7 +3,7 @@ layout: post
 title: 7 things to know as a Senior Software Engineer
 date: 2019-01-17 00:00:00 +0000
 categories: docker
-permalink: /@marcus/7-things-to-know-as-a-senior-software-engineer
+permalink: /@marcus/7-things-to-know-as-a-senior-software-engineer/
 ---
 
 Are you looking for how you can take the next step in your career and move on to become a senior software engineer? This year I celebrate my 10th year of professional software engineering experience and during this long journey where I moved from being a junior web developer to becoming a senior software engineer I learned a lot of valuable lessons that I feel made me mature enough to be considered a senior member of any team.

@@ -3,7 +3,7 @@ layout: post
 title: Write Unit Tests with Python's unittest Module
 date: 2019-01-28 00:00:00 +0000
 categories: docker
-permalink: /@marcus/write-unit-tests-with-pythons-unittest-module
+permalink: /@marcus/write-unit-tests-with-pythons-unittest-module/
 ---
 
 Writing great unit tests is one of the things that I've discovered throughout my career to have the single most impact on the quality of code that I produce as a software engineer.

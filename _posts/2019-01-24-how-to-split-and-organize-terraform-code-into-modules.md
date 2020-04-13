@@ -3,7 +3,7 @@ layout: post
 title: How to Split and Organize Terraform Code Into Modules
 date: 2019-01-24 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-split-and-organize-terraform-code-into-modules
+permalink: /@marcus/how-to-split-and-organize-terraform-code-into-modules/
 ---
 
 Terraform is one of my favorite tools that I picked up last year and part of why I like it is the ability to organize your infrastructure as code into readable, logical chunks of digestible code that any developer can lookup and easily understand within a quick glance.

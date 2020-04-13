@@ -3,7 +3,7 @@ layout: post
 title: Prevent Terraform from Recreating or Deleting Resource
 date: 2019-02-24 00:00:00 +0000
 categories: docker
-permalink: /@marcus/prevent-terraform-from-recreating-or-deleting-resource
+permalink: /@marcus/prevent-terraform-from-recreating-or-deleting-resource/
 ---
 
 Believe it or not, during the past few months I've managed to delete the database of this website not just once but twice (almost three!). Imagine that, how can someone be so clumsy to delete their whole database?!

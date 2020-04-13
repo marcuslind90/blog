@@ -3,7 +3,7 @@ layout: post
 title: 8 things you need to know to become a DevOps Engineer
 date: 2019-01-16 00:00:00 +0000
 categories: docker
-permalink: /@marcus/8-things-you-need-to-know-to-become-a-devops-engineer
+permalink: /@marcus/8-things-you-need-to-know-to-become-a-devops-engineer/
 ---
 
 As web applications get more complex with the need to scale to millions of users and the need to have to deliver new features multiple times per day, the demand for DevOps Engineers have been growing like crazy within the last few years. 

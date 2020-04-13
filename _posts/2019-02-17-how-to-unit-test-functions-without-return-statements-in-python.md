@@ -3,7 +3,7 @@ layout: post
 title: How to Unit Test Functions Without Return Statements in Python
 date: 2019-02-17 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-unit-test-functions-without-return-statements-in-python
+permalink: /@marcus/how-to-unit-test-functions-without-return-statements-in-python/
 ---
 
 Unit Testing is one of the core concepts within programming that any software engineer should have a proper understanding of. Normally, we usually test and assert that a method returns a certain response, but what about functions that don't return any response? How do we test and assert that they do what we intend them to do?

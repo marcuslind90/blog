@@ -3,7 +3,7 @@ layout: post
 title: How to Automatically Backup Postgres to S3 and Cloud
 date: 2019-01-16 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-automatically-backup-postgres-to-s3-and-cloud
+permalink: /@marcus/how-to-automatically-backup-postgres-to-s3-and-cloud/
 ---
 
 Many modern cloud providers such as Amazon Web Services or Microsoft Azure offer managed database instances that makes it much easier to properly provision and run a database. They can help you with scaling, high availability fallbacks and backups.

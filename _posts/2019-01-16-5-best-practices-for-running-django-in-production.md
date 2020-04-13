@@ -3,7 +3,7 @@ layout: post
 title: 5 Best Practices for Running Django in Production
 date: 2019-01-16 00:00:00 +0000
 categories: docker
-permalink: /@marcus/5-best-practices-for-running-django-in-production
+permalink: /@marcus/5-best-practices-for-running-django-in-production/
 ---
 
 So you've created your Django application and you're finally ready to deploy your code to your public server where you'll be expect to get a ton of visitor coming to your website to enjoy your content. What can you do to prepare for this and make sure that your website perform as good as possible in a production environment?

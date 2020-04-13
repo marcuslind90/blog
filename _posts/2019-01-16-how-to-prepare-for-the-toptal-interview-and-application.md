@@ -3,7 +3,7 @@ layout: post
 title: How to Prepare for the TopTal Interview and Application
 date: 2019-01-16 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-prepare-for-the-toptal-interview-and-application
+permalink: /@marcus/how-to-prepare-for-the-toptal-interview-and-application/
 ---
 
 In the spring of 2018 I was working as a senior software engineer at a medium sized technology company in Bangkok, Thailand. I didn't really like it much, I was working there because I was taking a break from entrepreneurship for a while until I could figure out what I wanted to do next. 

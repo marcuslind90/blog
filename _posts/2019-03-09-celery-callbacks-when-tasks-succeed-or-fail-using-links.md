@@ -3,7 +3,7 @@ layout: post
 title: Prepare for the Software Engineering Phone Interview
 date: 2019-03-09 00:00:00 +0000
 categories: docker
-permalink: /@marcus/celery-callbacks-when-tasks-succeed-or-fail-using-links
+permalink: /@marcus/celery-callbacks-when-tasks-succeed-or-fail-using-links/
 ---
 
 Reacting on calls to Celery tasks is one of the first things that you will want to dig deeper in as soon as you start scratching the surface of Celery. How do you react on when a task finishes or fails, and then trigger some other code when these events occur?

@@ -3,7 +3,7 @@ layout: post
 title: How to start a Django Project with Docker
 date: 2019-01-16 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-start-a-django-project-with-docker
+permalink: /@marcus/how-to-start-a-django-project-with-docker/
 ---
 
 How do you setup a new Django project with Docker while following the best practices and making sure that your local development environment stay as close as possible to your production environment?
@@ -208,4 +208,3 @@ After you've added your `.gitignore` file you should be able to push your change
 	git add .
 	git commit -m "Initial commit"
 	git push
-    

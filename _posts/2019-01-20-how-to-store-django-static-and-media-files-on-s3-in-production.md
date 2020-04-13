@@ -3,7 +3,7 @@ layout: post
 title: How to Store Django Static and Media Files on S3 in Production
 date: 2019-01-20 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-store-django-static-and-media-files-on-s3-in-production
+permalink: /@marcus/how-to-store-django-static-and-media-files-on-s3-in-production/
 ---
 
 Storing your static or media files on a remote storage in the cloud such as Amazon Web Services S3 or DigitalOcean Spaces is one of the first things that I recommend you to do when you setup a new Django project that is ready to go into production.

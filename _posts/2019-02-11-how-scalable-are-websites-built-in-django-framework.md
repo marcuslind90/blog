@@ -3,7 +3,7 @@ layout: post
 title: How Scalable are Websites Built in Django Framework?
 date: 2019-02-11 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-scalable-are-websites-built-in-django-framework
+permalink: /@marcus/how-scalable-are-websites-built-in-django-framework/
 ---
 
 Scalability is one of the key concerns that you should take into account when you are planning to build a new application. Your application might start off small, but with time it might grow larger and you definitely want to avoid any kind of rewrite. Because of this, it is important to pick a framework that is easy to get going with, but that is also easy to scale.

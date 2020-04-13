@@ -3,7 +3,7 @@ layout: post
 title: Python Tips and Tricks for Path and URL Parsing
 date: 2019-03-02 00:00:00 +0000
 categories: docker
-permalink: /@marcus/python-tips-and-tricks-for-path-and-url-parsing
+permalink: /@marcus/python-tips-and-tricks-for-path-and-url-parsing/
 ---
 
 Parsing file paths, web addresses or file names is something that we have to come back to over and over again in different situations. It could be that you want to validate the file extension of a file name, or perhaps that you want to get a hostname of a full URL.

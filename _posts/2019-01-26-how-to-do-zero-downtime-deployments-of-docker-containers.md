@@ -3,7 +3,7 @@ layout: post
 title: How to do Zero Downtime Deployments of Docker Containers
 date: 2019-01-26 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-do-zero-downtime-deployments-of-docker-containers
+permalink: /@marcus/how-to-do-zero-downtime-deployments-of-docker-containers/
 ---
 
 Green and Blue Deployments, or Zero Downtime Deployments is a hot topic that is relevant for any DevOps Engineer. It's the discussion of how we can update our application without causing any disturbance to the user experience while we're doing it. 

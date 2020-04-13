@@ -3,7 +3,7 @@ layout: post
 title: How to Run Command in Background or Daemon with Linux
 date: 2019-01-24 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-run-command-in-background-or-daemon-with-linux
+permalink: /@marcus/how-to-run-command-in-background-or-daemon-with-linux/
 ---
 
 What if you have a task that you want to be running at all times on your system, but you don't want to run it in a terminal manually, instead you want it to always be running in the background of your Linux environment. How would you achieve this?

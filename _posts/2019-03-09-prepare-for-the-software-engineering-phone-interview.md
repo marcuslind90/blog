@@ -3,7 +3,7 @@ layout: post
 title: Prepare for the Software Engineering Phone Interview
 date: 2019-03-09 00:00:00 +0000
 categories: docker
-permalink: /@marcus/prepare-for-the-software-engineering-phone-interview
+permalink: /@marcus/prepare-for-the-software-engineering-phone-interview/
 ---
 
 These days, many of the large tech companies that people are aspiring to work for, are following a very similar recruitment process that is split up into multiple steps that slowly filter down the applicants to a few final ones.

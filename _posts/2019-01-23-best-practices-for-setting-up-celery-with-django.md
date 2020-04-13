@@ -3,7 +3,7 @@ layout: post
 title: Best Practices for Setting Up Celery with Django
 date: 2019-01-23 00:00:00 +0000
 categories: docker
-permalink: /@marcus/best-practices-for-setting-up-celery-with-django
+permalink: /@marcus/best-practices-for-setting-up-celery-with-django/
 ---
 
 Asynchronous Celery tasks can be a great solution to many problems that you might encounter when you're building a Django application. It allows you to move the processing of long running tasks to the background, and continue serving the visitor their HTTP request without having to wait for the long running task to finish.

@@ -3,7 +3,7 @@ layout: post
 title: How to Inject New Docker Tag into Docker Compose File
 date: 2019-01-24 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-inject-new-docker-tag-into-docker-compose-file
+permalink: /@marcus/how-to-inject-new-docker-tag-into-docker-compose-file/
 ---
 
 If you follow best practices then you're tagging each of your Docker images with a unique tag or version whenever it gets updated. These tags might be the git commit hash, a CI/CD Build number or any other value that is usually generated automatically during your build process.

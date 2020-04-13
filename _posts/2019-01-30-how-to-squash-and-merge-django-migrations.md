@@ -3,7 +3,7 @@ layout: post
 title: How to Squash and Merge Django Migrations
 date: 2019-01-30 00:00:00 +0000
 categories: docker
-permalink: /@marcus/how-to-squash-and-merge-django-migrations
+permalink: /@marcus/how-to-squash-and-merge-django-migrations/
 ---
 
 Django Migrations are one of the main features that keep me coming back to Django for most of the projects I work on. Being able to simply define the database model in python, and then sync it with the database schema using migrations adds so much value to a project.

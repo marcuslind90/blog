@@ -3,7 +3,7 @@ layout: post
 title: Publish your documentation to GitHub Pages from Jenkins Pipeline
 date: 2019-11-18 00:00:00 +0000
 categories: jenkins devops documentation github-pages
-permalink: /@marcus/automatically-publish-your-documentation-to-github-pages-with-your-cicd-pipeline
+permalink: /@marcus/automatically-publish-your-documentation-to-github-pages-with-your-cicd-pipeline/
 ---
 
 A proper documentation is a must have for any project that is expected to be shared or handed over to someone else in the future. Personally, in all of my professional projects I stress the importance of starting with a documentation from the start of the project and populating it as we go along, instead of treating it as an afterthought and fill it out in the end before client handover.
