@@ -23,14 +23,23 @@ email: marcuslind90@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Personal blog of Marcus Lind
 baseurl: "" # the subpath of your site, e.g. /blog
+paginate: 10
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username:
 github_username: marcuslind90
 
+ga_analytics: UA-132416587-1
+
 # Build settings
-theme: minima
+# theme: poole
 plugins:
-  - jekyll-feed
+  - jekyll-gist
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+sass:
+  sass_dir: _sass
+  style: :compressed
 
 # Exclude from processing.
 # The following items will not be processed, by default.
