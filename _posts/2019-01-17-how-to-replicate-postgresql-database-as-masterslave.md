@@ -50,12 +50,13 @@ The first step when it comes to setting up replication is to change the configur
 
 PostgreSQL knows which values to ignore based on if it's running as a Master or Slave. So the configuration values that only relate to Master instances will be ignored if the server is being run as a Slave and the other way around.
 
-	::bash
-	wal_level = hot_standby
-	max_wal_senders = $PG_MAX_WAL_SENDERS
-	wal_keep_segments = $PG_WAL_KEEP_SEGMENTS
-	hot_standby = on
-	
+```bash
+wal_level = hot_standby
+max_wal_senders = $PG_MAX_WAL_SENDERS
+wal_keep_segments = $PG_WAL_KEEP_SEGMENTS
+hot_standby = on
+```
+
 As you can see, most settings relate to something that PostgreSQL call "wal". This stands for "Write Ahead Log" and it is what we use to replicate data between instances.
 
 - `wal_level` controls how much data is stored within the WAL. The default value is `minimal` which isn't enough for us to replicate data.
@@ -70,9 +71,10 @@ HBA stands for host-based authentication and the `pg_hba.conf` file allow us to 
 
 In my case, I prefer to limit access to the database instances with Firewalls on a higher level, and because of this I allow authentication from any source within my `pg_hba.conf` file. Simply put, I don't need to worry about unknown connections since by database is not exposed to the public.
 
-	::bash
-	host replication all 0.0.0.0/0 md5
-	host all all 0.0.0.0/0 md5
+```bash
+host replication all 0.0.0.0/0 md5
+host all all 0.0.0.0/0 md5
+```
 
 This simply means that any IP is allowed to connect. The CIDR block syntax 0.0.0.0/0 means that it will match any IP address. If you have a public database, it is important that you limit the connections to only come from your other servers.
 
@@ -82,10 +84,11 @@ All of the things that we mentioned on the previous section can be applied to al
 ### Setting Configuration of recovery.conf
 The `recovery.conf` file describes to PostgreSQL how it should replicate data from the master to itself. For our case it will look like this:
 
-	::bash
-	standby_mode = on
-	primary_conninfo = 'host=${REPLICATE_FROM} port=5432 user=${POSTGRES_USER} password=${POSTGRES_PASSWORD}'
-	trigger_file = '/tmp/promote_to_master'
+```bash
+standby_mode = on
+primary_conninfo = 'host=${REPLICATE_FROM} port=5432 user=${POSTGRES_USER} password=${POSTGRES_PASSWORD}'
+trigger_file = '/tmp/promote_to_master'
+```
 
 - `standby_mode` controls if the server is "on standby" or not. This simply means if the database should continue trying to recover data from the master, even after it's been up to sync. It should always keep checking if more data is available.
 - `primary_conninfo` is a string that describes how the connection to our master database looks like. In my case I use environment variables for the master hostname, master username and master password. You should replace these values with your own.
@@ -94,8 +97,9 @@ The `recovery.conf` file describes to PostgreSQL how it should replicate data fr
 ### Get Initial Data from Master
 Before you start the replica database you should read in the master database to make sure both of them are synced. If you do not do this you will see errors when it tries to replicate from master to slave.
 
-	::bash
-	sudo -u postgres pg_basebackup -h ${REPLICATE_FROM} -D ${PGDATA} -U ${POSTGRES_USER} -vP -w
+```bash
+sudo -u postgres pg_basebackup -h ${REPLICATE_FROM} -D ${PGDATA} -U ${POSTGRES_USER} -vP -w
+```
 
 By using the `pg_basebackup` utility we can get an initial state from the master to our replica. The environment variables needed are the following:
 

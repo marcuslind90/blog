@@ -18,13 +18,14 @@ You will run into this issue fairly quick with Python, but don't worry there's s
 
 To use virtualenv you simply use the following commands:
 
-	::bash
-	# Install it system wide so it can be used anywhere.
-	pip install virtualenv
-	# Use virtualenv to setup a new interpreter within the envs/ folder
-	virtualenv --python=python3.6 envs
-	# Activate the new virtualenv
-	source ./envs/bin/activate
+```bash
+# Install it system wide so it can be used anywhere.
+pip install virtualenv
+# Use virtualenv to setup a new interpreter within the envs/ folder
+virtualenv --python=python3.6 envs
+# Activate the new virtualenv
+source ./envs/bin/activate
+```
 
 *Note that if you're on Windows you cannot use the `source` command. Instead you will have to run the .bat file at `./envs/Scripts/activate.bat`*
 

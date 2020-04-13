@@ -20,13 +20,14 @@ This is only partly true. The full truth is that yes, Terraform will recreate yo
 
 In my case, I had the following DigitalOcean Resource defitition
 
-	::terraform
-	resource "digitalocean_droplet" "db" {
-		name = "db"
-		image = "ubuntu-18-04-x64"
-		region = "sfo2"
-		...
-	}
+```terraform
+resource "digitalocean_droplet" "db" {
+    name = "db"
+    image = "ubuntu-18-04-x64"
+    region = "sfo2"
+    ...
+}
+```
 
 Notice that it points to use the Ubuntu 18.04 image. This image is stored with DigitalOcean and Terraform will pull it down and initiate my droplet with it whenever my droplets are created. But what happened to the minor version of Ubuntu? The current version of Ubuntu when writing this article is 18.04.2.
 
@@ -51,12 +52,13 @@ The first step that you should do is to completely disallow any deletion of a re
 
 You can achieve this by using the `lifecycle` block within your resource.
 
-	::terraform
-	resource "digitalocean_droplet" "db" {
-		lifecycle {
-        		prevent_destroy = true
-		}
-	}
+```terraform
+resource "digitalocean_droplet" "db" {
+    lifecycle {
+            prevent_destroy = true
+    }
+}
+```
 
 This will make sure that your resource **never gets destroyed**. The only way for you to destroy or recreate your instance is if you intentionally, manually remove this block to apply your new changes. This is a tag that you definitely should use on any stateful service or resource.
 
@@ -76,13 +78,14 @@ What we can do then, is to tell Terraform to ignore any changes to the image, so
 
 This is yet another thing that you can define in the Terraform resource `lifecycle` block.
 
-	::terraform
-	resource "digitalocean_droplet" "db" {
-		lifecycle {
-			prevent_destroy = true
-			ignore_changes = ["image", ]
-		}
-	}
+```terraform
+resource "digitalocean_droplet" "db" {
+    lifecycle {
+        prevent_destroy = true
+        ignore_changes = ["image", ]
+    }
+}
+```
 
 By adding the `ignore_changes` parameter to the `lifecycle` block, we can tell our Terraform resource definition to ignore any changes to the `image` field. This makes sure that Terraform does not attempt to reprovision the resource whenever the image changes.
 

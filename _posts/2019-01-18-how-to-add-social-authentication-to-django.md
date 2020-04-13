@@ -38,36 +38,38 @@ Let's go through a popular example together of how you can add Facebook Authenti
 ### Installing django-allauth
 Start off by installing the `django-allauth` package.
 
-	::bash
-	# Note that at the time of you reading this, there might be a 
-	# more recent version of the package.
-	pip install django-allauth>=0.37.0
+```bash
+# Note that at the time of you reading this, there might be a 
+# more recent version of the package.
+pip install django-allauth>=0.37.0
+```
 
 You should then follow the [installation documentation](https://django-allauth.readthedocs.io/en/latest/installation.html) of the package and add it to your application by adding the following information to your `settings.py` file.
 
-	::python
-	AUTHENTICATION_BACKENDS = (
-		'django.contrib.auth.backends.ModelBackend',
-		'allauth.account.auth_backends.AuthenticationBackend',
-	)
-	
-	INSTALLED_APPS = (
-		...
-		# Required
-		'django.contrib.auth',
-		'django.contrib.messages',
-		'django.contrib.sites',
-		# Required
-		'allauth',
-		'allauth.account',
-		'allauth.socialaccount',
-		# Add the providers that you want to install and support
-		'allauth.socialaccount.providers.facebook',
-		...
-	)
-	
-	SITE_ID = 1
-	
+```python
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+INSTALLED_APPS = (
+    ...
+    # Required
+    'django.contrib.auth',
+    'django.contrib.messages',
+    'django.contrib.sites',
+    # Required
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    # Add the providers that you want to install and support
+    'allauth.socialaccount.providers.facebook',
+    ...
+)
+
+SITE_ID = 1
+```
+
 Let's summarize these additions and what they do:
 
 - `AUTHENTICATION_BACKENDS` are the classes that will be used to check the values of the login form whenever its submitted. Each time you submit the form it will pass through each of the backend, and login the user with the first backend that matches the submitted form data. If no backend succeeds with logging in the user, then the authentication fails. We want to use the default `ModelBackend` to support the traditional Django users, but also add `AuthenticationBackend` to support our new Django Allauth package.
@@ -76,11 +78,12 @@ Let's summarize these additions and what they do:
 
 The next step is to add the `django-allauth` url's to your application with the following code added to `urls.py`:
 
-	::python
-	urlpatterns = [
-		path('accounts/', include('allauth.urls')),
-	]
-	
+```python
+urlpatterns = [
+    path('accounts/', include('allauth.urls')),
+]
+```
+
 All it does is that it maps the package URL's to its custom forms and pages.
 
 The final step is to run `python manage.py migrate` to add the required models and tables to your project's database. Voila you have now completed the installation!
@@ -147,20 +150,22 @@ It's a much cleaner way of styling your forms, and it also makes sure that if yo
 
 You can install Crispy Forms by doing the following:
 	
-	::bash
-	pip install django-crispy-forms>=1.7.2
-	
+```bash
+pip install django-crispy-forms>=1.7.2
+```
+
 You then add the following to your `settings.py` file:
 
-	::python
-	INSTALLED_APPS = (
-		...
-		'crispy_forms',
-	)
-	# This enables bootstrap4 styling, there are plenty of 
-	# other options that you can find within the documentation.
-	CRISPY_TEMPLATE_PACK = 'bootstrap4'
-	
+```python
+INSTALLED_APPS = (
+    ...
+    'crispy_forms',
+)
+# This enables bootstrap4 styling, there are plenty of 
+# other options that you can find within the documentation.
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+```
+
 Finally you use it by adding `{% raw %}{% load crispy_forms_tags %}{% endraw %}` to your template file and then adding the `crispy` filter to the form itself by writing `{{form|crispy}}`. This will now format the form with the `CRISPY_TEMPLATE_PACK` setting that you defined within your `settings.py` file.
 
 You can find other available template pack's within the [Crispy Forms Documentation](https://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs).

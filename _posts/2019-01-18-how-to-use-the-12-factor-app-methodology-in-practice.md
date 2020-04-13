@@ -62,15 +62,16 @@ The solution to this is the define each configuration value that might change be
 
 Let's use python as an example of what you should and shouldn't do.
 
-	::python
-	# Bad
-	DB_HOST = "db.domain.tld:5432"
-	DB_PASSWORD = "p4$$w0rd"
-	
-	# Good
-	DB_HOST = os.environ.get('DB_HOST')
-	DB_PASSWORD = os.environ.get('DB_PASSWORD', None)
-	
+```python
+# Bad
+DB_HOST = "db.domain.tld:5432"
+DB_PASSWORD = "p4$$w0rd"
+
+# Good
+DB_HOST = os.environ.get('DB_HOST')
+DB_PASSWORD = os.environ.get('DB_PASSWORD', None)
+```
+
 Not only does this allow you to protect the credentials from prying eyes, but it also makes it incredibly easy for you to change your credentials without having to rebuild and redeploy your code. You could for example automatically change passwords to some of your services on a certain schedule and just update the Environment Variable when you do so, or if one of your services goes down, you can simply point it to a new host in an instant.
 
 ## IV. Backing services

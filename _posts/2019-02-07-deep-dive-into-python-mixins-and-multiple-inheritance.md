@@ -17,34 +17,37 @@ Mixins are small classes that focus on providing a small set of specific feature
 
 For example, we could have a Mixin that looks like this:
 
-	::python
-	class MetaMixin(object):
-		"""Mixin to enhance web view with meta data"""
-		def get_meta_title(self) -> str:
-			"""Get meta title of page/view"""
-			return str(self.get_object())
+```python
+class MetaMixin(object):
+    """Mixin to enhance web view with meta data"""
+    def get_meta_title(self) -> str:
+        """Get meta title of page/view"""
+        return str(self.get_object())
+```
 
 As you can see, our code is calling the `get_object()` method. Where is that one defined? Not within our `MetaMixin`. If you would instantiate this class and call the `get_meta_title` method, an exception would be raised and the code wouldn't be running. We expect some other code to define this method somewhere. We expect our Mixin to be "mixed in" with other classes and other code.
 
 For example, we could use our Mixin in the following manners:
 
-	::python
-	from .mixins import MetaMixin
-	from .models import User
+```python
+from .mixins import MetaMixin
+from .models import User
 
-	class Foo(MetaMixin):
-		def get_object(self):
-			return User.get_user()
+class Foo(MetaMixin):
+    def get_object(self):
+        return User.get_user()
+```
 
 Or
 
-	::python
-	from .mixins import MetaMixin
-	from .views import DetailView
-	from .models import User
+```python
+from .mixins import MetaMixin
+from .views import DetailView
+from .models import User
 
-	class UserDetailView(MetaMixin, DetailView):
-		model = User
+class UserDetailView(MetaMixin, DetailView):
+    model = User
+```
 
 In the first example, we are using the `MetaMixin` as the base class for a new class where we implement the `get_object` method ourselves while in the second example, we are using multiple inheritance to enhance the features of the `DetailView` class. In the second case, we expect the `DetailView` to already have implemented the `get_object` method that our Mixin depends on.
 
@@ -72,44 +75,46 @@ Instead of creating large classes that work with every combination of these feat
 
 For example, imagine that we have a web view for an e-commerce store that represents a single `Product`. This type of view might be required for other types of database models as well such as a `Customer`, `Category` or `Order`. It, therefore, makes sense to create some kind of reusable code that we can use to automatically fetch the object from the database, maybe we can automatically expect there to be a `slug` or `id` url parameter that we could use to figure out which unique object we want to fetch.
 
-	::python
-	from .views import View
-	from .models import Product, Category, Customer, Order
+```python
+from .views import View
+from .models import Product, Category, Customer, Order
 
-	class SingleObjectMixin(object):
-		model = None
-		def get_object(self, request):
-			if self.model is None:
-				raise Exception("Model must be set.")
-			return self.model.get(id=request.kwargs.get("id")
+class SingleObjectMixin(object):
+    model = None
+    def get_object(self, request):
+        if self.model is None:
+            raise Exception("Model must be set.")
+        return self.model.get(id=request.kwargs.get("id")
 
-	class ProductView(SingleObjectMixin, View):
-		model = Product
+class ProductView(SingleObjectMixin, View):
+    model = Product
 
-	class CategoryView(SingleObjectMixin, View):
-		model = Category
+class CategoryView(SingleObjectMixin, View):
+    model = Category
 
-	class CustomerView(SingleObjectMixin, View):
-        model = Customer
+class CustomerView(SingleObjectMixin, View):
+    model = Customer
 
-	class OrderView(SingleObjectMixin, View):
-		model = Order
+class OrderView(SingleObjectMixin, View):
+    model = Order
+```
 
 Some of these views might also require authentication to be viewed, perhaps a user must be logged in to be able to see the details of an order. We can then imagine that we also have an `AuthMixin` that we could use to implement this behavior. We might, therefore, end up with the final code looking something like this:
 
 
-	::python
-	class ProductView(SingleObjectMixin, View):
-		model = Product
+```python
+class ProductView(SingleObjectMixin, View):
+    model = Product
 
-	class CategoryView(SingleObjectMixin, View):
-		model = Category
+class CategoryView(SingleObjectMixin, View):
+    model = Category
 
-	class CustomerView(SingleObjectMixin, AuthMixin, View):
-		model = Customer
+class CustomerView(SingleObjectMixin, AuthMixin, View):
+    model = Customer
 
-   	class OrderView(SingleObjectMixin, AuthMixin, View):
-		model = Order
+class OrderView(SingleObjectMixin, AuthMixin, View):
+    model = Order
+```
 
 As you can see, all of the new views that we have created inherit from the base `View` class, which contains the bulk of all logic or code required for our code to work. But all of them get unique behavior added to them in different ways using smaller Mixin classes that add specific, small sets of features to enhance the base class in different ways.
 
@@ -127,12 +132,13 @@ I am not naive enough to claim that I somehow have that official definition, but
 
 When you inherit multiple different mixins to your new class, it is important to remember the order which Python inherits these parents in.
 
-	::python
-	class Foo(FirstMixin, SecondMixin, BaseClass):
-		pass
+```python
+class Foo(FirstMixin, SecondMixin, BaseClass):
+    pass
 
-	class Bar(BaseClass, SecondMixin, FirstMixin):
-		pass
+class Bar(BaseClass, SecondMixin, FirstMixin):
+    pass
+```
 
 These two examples do not necessarily create the same set of functionality, even though they inherit from the same classes and mixins. Since they inherit classes in a different order, it means that it might override methods that exist in more than one of the classes in different ways.
 

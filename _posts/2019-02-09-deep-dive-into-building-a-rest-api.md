@@ -84,15 +84,16 @@ Let's then say that we have the following fields in our Article Table in our dat
 
 We might then represent this as the following JSON:
 
-	::json
-	{
-		"title": "5 Steps To Build a Great API",
-		"content": "Here we have a lot of content that can be quite long.",
-		"categories": [
-			"https://api.example.com/api/categories/1/",
-			"https://api.example.com/api/categories/2/",
-		]
-	}
+```json
+{
+    "title": "5 Steps To Build a Great API",
+    "content": "Here we have a lot of content that can be quite long.",
+    "categories": [
+        "https://api.example.com/api/categories/1/",
+        "https://api.example.com/api/categories/2/",
+    ]
+}
+```
 
 Note that we first of all give a good representational response of our data. We do not merge it all into a single HTML response, rename the fields or in any other way modify the response. 
 

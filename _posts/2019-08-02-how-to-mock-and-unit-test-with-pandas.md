@@ -45,39 +45,41 @@ There are multiple other ways you can mock the `DataFrame` that are much more su
 ### Mock Files with In-Memory File Objects
 Imagine that you have some code that look like this:
 
-    ::python
-    def get_df(self, file_path):
-        with open(file_path) as file:
-            df = pd.read_excel(file, sheet_name=0)
-        return df.rename({"foo_id": "bar_id"})
+```python
+def get_df(self, file_path):
+    with open(file_path) as file:
+        df = pd.read_excel(file, sheet_name=0)
+    return df.rename({"foo_id": "bar_id"})
+```
 
 How would you test that? Some developers might follow the path that I described above where they generate a real file on the file system that they pass into the `get_df()` function as the `file_path` argument. Bad idea.
 
 A much nicer way to go about it is to generate an in-memory Excel file that you mock the `open()` method with. This could be tested in the following manner:
 
-    ::python
-    import pandas as pd
-    from io import BytesIO
-    from unittest.mock import patch
+```python
+import pandas as pd
+from io import BytesIO
+from unittest.mock import patch
 
-    def test_get_df(self):
-        # Define a DF as the contents for your excel file.
-        df = pd.DataFrame({"foo_id": [1, 2, 3, 4, 5]})
-        # Create your in memory BytesIO file.
-        output = BytesIO()
-        writer = pd.ExcelWriter(output, engine="xlsxwriter")
-        df.to_excel(writer, sheet_name="Sheet1", index=False)
-        writer.save()
-        output.seek(0)  # Contains the Excel file in memory file.
+def test_get_df(self):
+    # Define a DF as the contents for your excel file.
+    df = pd.DataFrame({"foo_id": [1, 2, 3, 4, 5]})
+    # Create your in memory BytesIO file.
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine="xlsxwriter")
+    df.to_excel(writer, sheet_name="Sheet1", index=False)
+    writer.save()
+    output.seek(0)  # Contains the Excel file in memory file.
 
-        with patch("path.to.file.open") as open_mock:
-            open_mock.return_value = output
-            df = get_df("file/path/file.xslx")
-            open_mock.assert_called_once_with("file/path/file.xlsx")
+    with patch("path.to.file.open") as open_mock:
+        open_mock.return_value = output
+        df = get_df("file/path/file.xslx")
+        open_mock.assert_called_once_with("file/path/file.xlsx")
 
-        pd.testing.assert_frame_equal(
-            df, pd.DataFrame({"bar_id": [1, 2, 3, 4, 5]}
-        )
+    pd.testing.assert_frame_equal(
+        df, pd.DataFrame({"bar_id": [1, 2, 3, 4, 5]}
+    )
+```
 
 So in the case above, we are mocking the file itself and the whole `open()` call. The `file_path` argument passed into the function does not even matter since it is never actually used. 
 
@@ -89,10 +91,11 @@ So as we do this, what are we even testing? What are we achieving?
 ### Mock Pandas Read Functions
 The following method where we are using `patch` to mock the loading of the `DataFrame` can also be used in other cases where files might not be used. For example, we might have the following type of code:
 
-    ::python
-    def get_df():
-        df = pd.read_sql("SELECT * FROM foo;", connection)
-        return df.rename({"foo_id": "bar_id"})
+```python
+def get_df():
+    df = pd.read_sql("SELECT * FROM foo;", connection)
+    return df.rename({"foo_id": "bar_id"})
+```
 
 In this case, there is no `open()` method that loads a file object, instead, it uses the built-in `read_x` functions that exist within the Pandas library to read in the data from an external source, in this case, an SQL database.
 
@@ -106,16 +109,17 @@ So what do we want to test?
 
 We can achieve this with the following test:
 
-    ::python
-    from unittest.mock import patch, Mock
+```python
+from unittest.mock import patch, Mock
 
-    @patch("path.to.file.pandas.read_sql")
-    def test_get_df(read_sql_mock: Mock):
-        read_sql_mock.return_value = pd.DataFrame({"foo_id": [1, 2, 3]})
-        results = get_df()
-        read_sql_mock.assert_called_once()
-        
-        pd.testing.assert_frame_equal(results, pd.DataFrame({"bar_id": [1, 2, 3]})
+@patch("path.to.file.pandas.read_sql")
+def test_get_df(read_sql_mock: Mock):
+    read_sql_mock.return_value = pd.DataFrame({"foo_id": [1, 2, 3]})
+    results = get_df()
+    read_sql_mock.assert_called_once()
+    
+    pd.testing.assert_frame_equal(results, pd.DataFrame({"bar_id": [1, 2, 3]})
+```
 
 In this case, we use the `patch` as a decorator instead of as a context manager. When we use it as a decorator it automatically creates a mock that gets passed into the test function as an argument. 
 

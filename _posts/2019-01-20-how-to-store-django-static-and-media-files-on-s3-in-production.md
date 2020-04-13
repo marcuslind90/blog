@@ -36,12 +36,13 @@ For our example below I will show you how to implement remote storage at a S3 cl
 
 The installation of `django-storages` with its S3 dependency `boto3` is very easy. Just use the following commands.
 
-	::bash
-	# Note that there may be new versions of the
-	# package at the time of reading this article.
-	pip install boto3>=1.9.79
-	pip install django-storages>=1.7.1
-	
+```bash
+# Note that there may be new versions of the
+# package at the time of reading this article.
+pip install boto3>=1.9.79
+pip install django-storages>=1.7.1
+```
+
 Unlike many other Django packages, you **do not** need to add this package to your `INSTALLED_APPS` settings.
 
 
@@ -53,26 +54,27 @@ Note that the following settings use `AWS_` as prefix. This indicate that the se
 
 This means that no matter which one of these providers you use, you will use the settings that I show here below.
 
-	::python
-	DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-	STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-	
-	# Used to authenticate with S3
-	AWS_ACCESS_KEY_ID = os.environ.get('S3_ACCESS_KEY_ID')
-	AWS_SECRET_ACCESS_KEY = os.environ.get('S3_SECRET_ACCESS_KEY')
-	
-	# Configure which endpoint to send files to, and retrieve files from.
-	AWS_STORAGE_BUCKET_NAME = 'mybucket'
-	AWS_S3_REGION_NAME = 'sfo2'
-	AWS_S3_ENDPOINT_URL = f"https://{AWS_S3_REGION_NAME}.digitaloceanspaces.com"
-	AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME.{AWS_S3_REGION_NAME}.digitaloceanspaces.com"
-	AWS_LOCATION = 'files'
-	
-	# General optimization for faster delivery
-	AWS_IS_GZIPPED = True
-	AWS_S3_OBJECT_PARAMETERS = {
-		'CacheControl': 'max-age=86400',
-	}
+```python
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Used to authenticate with S3
+AWS_ACCESS_KEY_ID = os.environ.get('S3_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('S3_SECRET_ACCESS_KEY')
+
+# Configure which endpoint to send files to, and retrieve files from.
+AWS_STORAGE_BUCKET_NAME = 'mybucket'
+AWS_S3_REGION_NAME = 'sfo2'
+AWS_S3_ENDPOINT_URL = f"https://{AWS_S3_REGION_NAME}.digitaloceanspaces.com"
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME.{AWS_S3_REGION_NAME}.digitaloceanspaces.com"
+AWS_LOCATION = 'files'
+
+# General optimization for faster delivery
+AWS_IS_GZIPPED = True
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+```
 
 Let's go through all of these settings together to make sure we have a proper understanding of what we're actually doing. 
 
@@ -89,12 +91,13 @@ Let's go through all of these settings together to make sure we have a proper un
 
 Finally you also have to define your normal Django static and media files settings. I use the following settings that are added to my `settings.py` file.
 
-	::python
-	STATIC_ROOT = 'static'
-	MEDIA_ROOT = 'media'
-	STATIC_URL = f"https://{AWS_S3_ENDPOINT_URL}/{STATIC_ROOT}/"
-	MEDIA_URL = f"https://{AWS_S3_ENDPOINT_URL}/{MEDIA_ROOT}/"
-	
+```python
+STATIC_ROOT = 'static'
+MEDIA_ROOT = 'media'
+STATIC_URL = f"https://{AWS_S3_ENDPOINT_URL}/{STATIC_ROOT}/"
+MEDIA_URL = f"https://{AWS_S3_ENDPOINT_URL}/{MEDIA_ROOT}/"
+```
+
 This defines how my files and paths are created and served.
 
 That's it, you should now be able to run `python manage.py collectstatic` and your application should now upload all of your files to your remote S3 storage!
@@ -113,54 +116,55 @@ Sometimes you might need to integrate your Django application with cloud storage
 
 In this case I had to create my own custom storage class for uploaded Media files. Luckily Django have great good documentation of how to [create custom storage classes](https://docs.djangoproject.com/en/2.1/howto/custom-file-storage/).
 
-	::python
-	from django.conf import settings
-	from django.core.files.storage import Storage
+```python
+from django.conf import settings
+from django.core.files.storage import Storage
 
-	class CoderbookStorage(Storage):
-		def __init__(self, *args, **kwargs):
-			"""
-			The init method MUST NOT require any args to be set.
-			The Storage instance should be able to be instantiated
-			without passing in any args. You could use kwargs with 
-			default values though.
-			
-			If you want to read settings you should read them from 
-			django.conf.settings.
-			"""
-			super().__init__(*args, **kwargs)
+class CoderbookStorage(Storage):
+    def __init__(self, *args, **kwargs):
+        """
+        The init method MUST NOT require any args to be set.
+        The Storage instance should be able to be instantiated
+        without passing in any args. You could use kwargs with 
+        default values though.
+        
+        If you want to read settings you should read them from 
+        django.conf.settings.
+        """
+        super().__init__(*args, **kwargs)
 
-		def _open(self, name, mode='rb'):
-			"""Required method that implements how files are opened/read"""
-			raise NotImplementedError("Method not implemented yet.")
-		
-		def _save(self, name, content):
-			"""Required method that implements how files are save/written"""
-			raise NotImplementedError("Method not implemented yet.")
-			
-		def delete(self, name):
-			"""Optional method that delete file at filepath"""
-			raise NotImplementedError("Method not implemented yet.")
-		
-		def exists(self, name):
-			"""Optional method that return if file exists"""
-			raise NotImplementedError("Method not implemented yet.")
-		
-		def listdir(self, path):
-			"""Optional method that return list of files and dirs in path"""
-			raise NotImplementedError("Method not implemented yet.")
-		
-		def size(self, name):
-			"""Optional method that return filesize of file"""
-			raise NotImplementedError("Method not implemented yet.")
-		
-		def url(self, name):
-			"""Optional method that return the public URL of a file"""
-			raise NotImplementedError("Method not implemented yet.")
-			
-		def path(self, name):
-			"""Optional method that return absolute path of file"""
-			raise NotImplementedError("Method not implemented yet.")
+    def _open(self, name, mode='rb'):
+        """Required method that implements how files are opened/read"""
+        raise NotImplementedError("Method not implemented yet.")
+    
+    def _save(self, name, content):
+        """Required method that implements how files are save/written"""
+        raise NotImplementedError("Method not implemented yet.")
+        
+    def delete(self, name):
+        """Optional method that delete file at filepath"""
+        raise NotImplementedError("Method not implemented yet.")
+    
+    def exists(self, name):
+        """Optional method that return if file exists"""
+        raise NotImplementedError("Method not implemented yet.")
+    
+    def listdir(self, path):
+        """Optional method that return list of files and dirs in path"""
+        raise NotImplementedError("Method not implemented yet.")
+    
+    def size(self, name):
+        """Optional method that return filesize of file"""
+        raise NotImplementedError("Method not implemented yet.")
+    
+    def url(self, name):
+        """Optional method that return the public URL of a file"""
+        raise NotImplementedError("Method not implemented yet.")
+        
+    def path(self, name):
+        """Optional method that return absolute path of file"""
+        raise NotImplementedError("Method not implemented yet.")
+```
 
 It is pretty straight forward how you implement a custom storage class. You just implement the required `_open()` and `_save()` methods. Obviously as you can see you can extend your storage class with additional useful methods if needed.
 

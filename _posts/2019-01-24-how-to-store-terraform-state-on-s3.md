@@ -26,24 +26,25 @@ You could use Terraform Enterprise which is their paid solution that will help y
 ## Terraform Remote State Storage in Cloud
 The way we define a remote backend is by simply setting the `terraform.backend` definitions within our root `main.tf` file.
 
-	::terraform
-	provider "digitalocean" {
-		token = "${var.do_token}"
-	}
+```terraform
+provider "digitalocean" {
+    token = "${var.do_token}"
+}
 
-	terraform {
-		backend "s3" {
-			bucket = "MY_BUCKET_NAME"
-			key = "terraform/terraform.tfstate"
-			region = "us-east-1"
-			endpoint = "https://ams3.digitaloceanspaces.com"
-			skip_credentials_validation = true
-			skip_get_ec2_platforms = true
-			skip_requesting_account_id = true
-			skip_metadata_api_check = true
-		}
-	}
-	
+terraform {
+    backend "s3" {
+        bucket = "MY_BUCKET_NAME"
+        key = "terraform/terraform.tfstate"
+        region = "us-east-1"
+        endpoint = "https://ams3.digitaloceanspaces.com"
+        skip_credentials_validation = true
+        skip_get_ec2_platforms = true
+        skip_requesting_account_id = true
+        skip_metadata_api_check = true
+    }
+}
+```
+
 As in most cases when we use tools that integrate with the S3 Protocol, the settings seem to be very focused and targeted towards Amazon Web Services S3 Storage. Note that its not just Amazon that use S3 as a protocol, DigitalOcean Spaces which is what we're using in this example also uses it.
 
 So what do we do here?
@@ -58,13 +59,14 @@ Finally, we also have to provide the credentials of our application. We don't wa
 
 So how do we achieve this then? Luckily for us, the `terraform init` command allows us to define backend config parameters using the `-backend-config` command options.
 
-	::bash
-	terraform init -backend-config="access_key=$ACCESS_KEY" \
-	     -backend-config="secret_key=$SECRET_KEY"
- 
- This would be exactly the same as writing it within the backend block, but it allows us to use Environment Variables from the system level instead.
- 
- At this point your integration should be working and by running the `terraform init` command it should connect to your S3 instance and initiate the state files there. Now every time changes are being done, it will read and write the updates to the remote storage that will be used no matter from where you execute the `terraform` commands. 
+```bash
+terraform init -backend-config="access_key=$ACCESS_KEY" \
+        -backend-config="secret_key=$SECRET_KEY"
+```
+
+This would be exactly the same as writing it within the backend block, but it allows us to use Environment Variables from the system level instead.
+
+At this point your integration should be working and by running the `terraform init` command it should connect to your S3 instance and initiate the state files there. Now every time changes are being done, it will read and write the updates to the remote storage that will be used no matter from where you execute the `terraform` commands. 
  
 This means that now you can execute things locally, in a CI/CD Pipeline or from your team members computer and each time it will share the same information of the state of your infrastructure.
 

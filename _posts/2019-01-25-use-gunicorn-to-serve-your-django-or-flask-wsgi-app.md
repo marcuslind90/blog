@@ -23,17 +23,18 @@ When WSGI was introduced, there was finally an interface that we could expect ev
 
 Most web frameworks such as Django or Flask takes care of generating the WSGI callable that is used by the web server to serve your application, but for the sake of example let's create our own.
 
-	::python
-	def application (environ, start_response):
-		response_body = 'Request method: %s' % environ['REQUEST_METHOD']
-		status = '200 OK'
-		response_headers = [
-			('Content-Type', 'text/plain'),
-			('Content-Length', str(len(response_body)))
-		]
+```python
+def application (environ, start_response):
+    response_body = 'Request method: %s' % environ['REQUEST_METHOD']
+    status = '200 OK'
+    response_headers = [
+        ('Content-Type', 'text/plain'),
+        ('Content-Length', str(len(response_body)))
+    ]
 
-		start_response(status, response_headers)
-		return [response_body]
+    start_response(status, response_headers)
+    return [response_body]
+```
 
 That's it! Pretty simple right? Well, let's summarize what we just did.
 
@@ -63,15 +64,17 @@ Since Gunicorn never is expected to directly face the internet, it also means th
 ### How to Install Gunicorn
 Gunicorn is completely built in Python and it can be installed using Python's package manager `pip`.
 
-	::bash
-	# There might be a more recent version out 
-	# at the point of you reading this article.
-	pip install gunicorn>=19.9.0
+```bash
+# There might be a more recent version out 
+# at the point of you reading this article.
+pip install gunicorn>=19.9.0
+```
 
 You will then be able to run it to start serving your application with a single command:
 
-	::bash
-	gunicorn foo.wsgi:application -w 5 --bind 0.0.0.0:8000
+```bash
+gunicorn foo.wsgi:application -w 5 --bind 0.0.0.0:8000
+```
 
 Let's summarize what this command actually does:
 
@@ -81,14 +84,15 @@ Let's summarize what this command actually does:
 
 That should be it, at this point you should see something like the following output, which means that you've spawned 5 workers that are awaiting incoming requests.
 
-	::bash
-	[2019-09-10 10:22:28 +0000] [30869] [INFO] Listening at: http://0.0.0.0:8000 (30869)
-	[2019-09-10 10:22:28 +0000] [30869] [INFO] Using worker: sync
-	[2019-09-10 10:22:28 +0000] [30874] [INFO] Booting worker with pid: 30874
-	[2019-09-10 10:22:28 +0000] [30875] [INFO] Booting worker with pid: 30875
-	[2019-09-10 10:22:28 +0000] [30876] [INFO] Booting worker with pid: 30876
-	[2019-09-10 10:22:28 +0000] [30877] [INFO] Booting worker with pid: 30877
-	[2019-09-10 10:22:28 +0000] [30878] [INFO] Booting worker with pid: 30878
+```bash
+[2019-09-10 10:22:28 +0000] [30869] [INFO] Listening at: http://0.0.0.0:8000 (30869)
+[2019-09-10 10:22:28 +0000] [30869] [INFO] Using worker: sync
+[2019-09-10 10:22:28 +0000] [30874] [INFO] Booting worker with pid: 30874
+[2019-09-10 10:22:28 +0000] [30875] [INFO] Booting worker with pid: 30875
+[2019-09-10 10:22:28 +0000] [30876] [INFO] Booting worker with pid: 30876
+[2019-09-10 10:22:28 +0000] [30877] [INFO] Booting worker with pid: 30877
+[2019-09-10 10:22:28 +0000] [30878] [INFO] Booting worker with pid: 30878
+```
 
 ### Separate Gunicorn Settings into Config File
 The command mentioned in the previous section is enough for you to start serving your web application to your visitors in production with only 2 custom settings. But what if you want to configure your Gunicorn server more than that?
@@ -97,35 +101,39 @@ Maybe you want to add logging, define timeouts, set thread counts or dig deeper 
 
 Gunicorn allows you to create your own separate `myconfig.py` file that can hold all your settings for you. Just create a `.py` file anywhere within your repository and run Gunicorn with the following command instead.
 
-	::bash
-	gunicorn -c myconfig foo.wsgi:application
+```bash
+gunicorn -c myconfig foo.wsgi:application
+```
 
 `-c` is the option that allows you to set a path to a config file. In this case, we define it as a python path so it could also be something like `foo.bar.myconfig` if it would be located in `/foo/bar/myconfig.py`.
 
 We could then populate our config with something like this to replicate our original settings.
 
-	::python
-	workers = 5
-	bind = "0.0.0.0:8000"
+```python
+workers = 5
+bind = "0.0.0.0:8000"
+```
 
 ## Finding the WSGI Path of my Django Project
 Django is a great framework that comes with all the batteries included that we could think off, one of these things is obviously a preexisting WSGI file.
 
 Whenever you initiate your Django project with the `django-admin startproject` command, you will get something like the following file structure.
 
-	::bash
-	./
-		project/
-			__init__.py
-			settings.py
-			urls.py
-			wsgi.py
-		manage.py
+```bash
+./
+    project/
+        __init__.py
+        settings.py
+        urls.py
+        wsgi.py
+    manage.py
+```
 
 As you can see, the `wsgi.py` file is already created for you, and it contains an `application` variable that you should point Gunicorn to. With the file structure that we used in the example above, the final Gunicorn command would look something like this:
 
-	::bash
-	gunicorn -c config project.wsgi:application
+```bash
+gunicorn -c config project.wsgi:application
+```
 
 That's it!
 
@@ -136,23 +144,26 @@ Because of this, we are required to create our own WSGI file that we need to poi
 
 Imagine that we have a file structure that looks something like this:
 
-	::bash
-	./
-		app.py
-		config.py
-		wsgi.py
+```bash
+./
+    app.py
+    config.py
+    wsgi.py
+```
 
 - `app.py` is the file that contains your `app = Flask(__name__)` definition. 
 - `config.py` is the file that contains your Gunicorn configuration.
 
 All you have to do in this example is to create a `wsgi.py` file and populate it with a single line of code.
 
-	::python
-	from app import app as application
+```python
+from app import app as application
+```
 
 We can then point Gunicorn to use our `application` callable with the following command:
 
-	::bash
-	gunicorn -c config wsgi:application
+```bash
+gunicorn -c config wsgi:application
+```
 
 You should now be able to serve your Flask application with Gunicorn!

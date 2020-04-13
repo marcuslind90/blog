@@ -26,19 +26,20 @@ Note that this can be applied both on `task.apply_async()` and on `celery.send_t
 
 Here's an example of how we can enable retry and set a retry policy:
 
-	::python
-	from tasks.celery import app
+```python
+from tasks.celery import app
 
-	app.send_task(
-		"foo.task",
-		retry=True,
-		retry_policy=dict(
-			max_retries=3,
-			interval_start=3,
-			interval_step=1,
-			interval_max=6
-		)
-	)
+app.send_task(
+    "foo.task",
+    retry=True,
+    retry_policy=dict(
+        max_retries=3,
+        interval_start=3,
+        interval_step=1,
+        interval_max=6
+    )
+)
+```
 
 What this means is that if the connection fails and we cannot send the message to the message queue, we will attempt to retry 3 times. The first retry will happen at `interval_start` seconds, meaning 3 seconds. Then each additional failure will wait for another `interval_step` 1 second until it attempts to send the message again.
 
@@ -55,19 +56,20 @@ Unlike the first scenario where we told the client to retry to send the task aga
 
 Here's an example of how we can retry a task when an Exception is raised:
 
-	::python
-	import logging
-	from tasks.celery import app
-	
-	logger = logging.getLogger(__name__)
+```python
+import logging
+from tasks.celery import app
 
-	@app.task(name="foo.task", bind=True, max_retries=3)
-	def foo_task(self):
-		try:
-			execute_something()
-		except Exception as ex:
-			logger.exception(ex)
-			self.retry(countdown=3**self.request.retries)
+logger = logging.getLogger(__name__)
+
+@app.task(name="foo.task", bind=True, max_retries=3)
+def foo_task(self):
+    try:
+        execute_something()
+    except Exception as ex:
+        logger.exception(ex)
+        self.retry(countdown=3**self.request.retries)
+```
 
 Let's go through what all of this code do:
 

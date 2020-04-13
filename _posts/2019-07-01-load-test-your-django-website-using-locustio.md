@@ -26,22 +26,23 @@ It allows us to define what is called a `TaskSet` that contains multiple differe
 
 For example, a task set to load test this website that you're reading this blog post on could look something like this:
 
-    ::python
-    from locust import HttpLocust, TaskSet, task
+```python
+from locust import HttpLocust, TaskSet, task
 
-    class WebsiteTasks(TaskSet):
-        @task(5)
-        def index(self):
-            self.client.get("/")
-        
-        @task(10)
-        def blog_post(self):
-            self.client.get("/@marcus/any-blog-post/")
+class WebsiteTasks(TaskSet):
+    @task(5)
+    def index(self):
+        self.client.get("/")
+    
+    @task(10)
+    def blog_post(self):
+        self.client.get("/@marcus/any-blog-post/")
 
-    class WebsiteUser(HttpLocust):
-        task_set = WebsiteTasks
-        min_wait = 5000
-        max_wait = 15000
+class WebsiteUser(HttpLocust):
+    task_set = WebsiteTasks
+    min_wait = 5000
+    max_wait = 15000
+```
 
 So to clarify each part:
 
@@ -66,8 +67,9 @@ After we have defined the load test tasks that we want to conduct, it is finally
 
 To run the file, simply use the following command:
 
-    ::bash
-    locust -f locustfile.py --host=https://example.com
+```bash
+locust -f locustfile.py --host=https://example.com
+```
 
 This will then run a web application that you can visit at http://127.0.0.1:8089 (If you run it locally) where you can run and review the load tests that gets executed to the `--host` parameter defined.
 

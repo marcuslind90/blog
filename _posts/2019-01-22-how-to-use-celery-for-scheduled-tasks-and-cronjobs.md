@@ -31,28 +31,31 @@ In the use case of this particular article, we are primarily interested in how w
 ### Install and Configure Celery
 Celery is easy to install, just install the Python package using pip:
 
-	::bash
-	# Note a more recent version might have been
-	# released at the time you're reading this article.
-	pip install celery>=4.2.1
-	
+```bash
+# Note a more recent version might have been
+# released at the time you're reading this article.
+pip install celery>=4.2.1
+```
+
 The next step is to create a `/tasks/` directory within our application where we will store our Celery related configurations and files. Start by initiating the following files:
 
-	::bash
-	./
-		/tasks
-			__init__.py
-			celery.py
-			config.py
+```bash
+./
+    /tasks
+        __init__.py
+        celery.py
+        config.py
+```
 
 The first file we will populate is the `celery.py` file.
 
-	::python
-	from celery import Celery
-	
-	
-	app = Celery("tasks")
-	app.config_from_object("tasks.config", namespace="CELERY")
+```python
+from celery import Celery
+
+
+app = Celery("tasks")
+app.config_from_object("tasks.config", namespace="CELERY")
+```
 
 Let's summarize what we're doing in this file:
 
@@ -61,18 +64,17 @@ Let's summarize what we're doing in this file:
 
 Next step will be to populate our `config.py` file:
 
-	::python
-	import os
+```python
+import os
 
+BROKER_USER = os.environ.get("BROKER_USER")
+BROKER_PASSWORD = os.environ.get("BROKER_PASSWORD")
+BROKER_HOST = os.environ.get("BROKER_HOST")
+BROKER_PORT = os.environ.get("BROKER_PORT")
+BROKER_VHOST = os.environ.get("BROKER_VHOST")
 
-	BROKER_USER = os.environ.get("BROKER_USER")
-	BROKER_PASSWORD = os.environ.get("BROKER_PASSWORD")
-	BROKER_HOST = os.environ.get("BROKER_HOST")
-	BROKER_PORT = os.environ.get("BROKER_PORT")
-	BROKER_VHOST = os.environ.get("BROKER_VHOST")
-
-
-	CELERY_BROKER_URL=f"amqp://{BROKER_USER}:{BROKER_PASSWORD}@{BROKER_HOST}:{BROKER_PORT}/{BROKER_VHOST}"
+CELERY_BROKER_URL=f"amqp://{BROKER_USER}:{BROKER_PASSWORD}@{BROKER_HOST}:{BROKER_PORT}/{BROKER_VHOST}"
+```
 
 All we define in our configuration is the `CELERY_BROKER_URL` which holds the URL to our RabbitMQ Broker that is using the `amqp://` protocol for its communication. This will be the broker that store all of our messages. Within the [Celery Documentation](http://docs.celeryproject.org/en/latest/getting-started/brokers/index.html) you can find examples of other types of brokers such as AWS SQS, Redis and more. I prefer using RabbitMQ.
 
@@ -81,16 +83,17 @@ Tasks are just regular Python functions that we decorate with a `@task` decorato
 
 Let's create a sample Task that will email notifications to all of our users.
 
-	::python
-	from tasks.celery import app
-	from myproject.models import User
-	
-	
-	@app.task(name="myproject.send_emails")
-	def send_email_task():
-		"""Task that send email to all users"""
-		users = User.objects.all()
-		send_user_emails(users=users)
+```python
+from tasks.celery import app
+from myproject.models import User
+
+
+@app.task(name="myproject.send_emails")
+def send_email_task():
+    """Task that send email to all users"""
+    users = User.objects.all()
+    send_user_emails(users=users)
+```
 
 The important part here is that you study how we decorate a method to become a task of a Celery application. Notice that we import the `app` variable from our `/tasks/celery.py` file that we created before, and then use it to decorate our function to register it as a task.
 
@@ -104,29 +107,31 @@ You can either do this by using the `app.autodiscover_tasks()` method, or by add
 Let's go back to our `celery.py` file to define the schedule of when we want our `myproject.send_emails` task to be executed.
 
 
-	::python
-	from celery import Celery
-	from celery.schedules import crontab
-	
-	
-	app = Celery("tasks")
-	app.config_from_object("tasks.config", namespace="CELERY")
-	
-	app.conf.beat_schedule = {
-		"trigger-email-notifications": {
-			"task": "myproject.send_emails",
-			"schedule": crontab(minute="0", hour="0", day="*")
-		}
-	}
+```python
+from celery import Celery
+from celery.schedules import crontab
+
+
+app = Celery("tasks")
+app.config_from_object("tasks.config", namespace="CELERY")
+
+app.conf.beat_schedule = {
+    "trigger-email-notifications": {
+        "task": "myproject.send_emails",
+        "schedule": crontab(minute="0", hour="0", day="*")
+    }
+}
+```
 
 - We create a new schedule that we name `trigger-email-notifications` that execute our task `myproject.send_emails`.
 - We import Celery's `crontab` method that allow us to define a schedule in a crontab format. In our case we define it so that the task will be triggered at 00:00 every day.
 
 For those we are new to Crontab, the way Crontab allow us to schedule jobs is by 5 different parameters and the format will be:
 
-	::bash
-	Minute  Hour  Day  Month  Day
-	*       *     *    *      *
+```bash
+Minute  Hour  Day  Month  Day
+*       *     *    *      *
+```
 
 The first "Day" stands for Day of month. So 1 would be the first of the month. The second "Day" stands for Day of Week, so 1 would mean "Monday".
 
@@ -137,8 +142,9 @@ As mentioned in the beginning of this article, a Celery Worker is a process that
 
 To run the worker that will execute heartbeats for our example above we need to run the following command:
 
-	::bash
-	celery -A tasks worker -B -Q celery -l DEBUG
+```bash
+celery -A tasks worker -B -Q celery -l DEBUG
+```
 
 Let's summarize what all of this does:
 
@@ -160,20 +166,21 @@ The first one is a great way to at least make sure that your task is being calle
 
 The second point is often overlooked and its such a great and simple way to follow up on what work that your code is executing. Adding logging can be done with just a few lines of code in a very simple manner.
 
-	::python
-	import logging
-	from tasks.celery import app
-	from myproject.models import User
+```python
+import logging
+from tasks.celery import app
+from myproject.models import User
 
 
-	logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
-	
-	@app.task(name="myproject.send_emails")
-	def send_email_task():
-		"""Task that send email to all users"""
-		users = User.objects.all()
-		send_user_emails(users=users)
-		logger.debug(f"Emails were send out to {len(users)} users")
+
+@app.task(name="myproject.send_emails")
+def send_email_task():
+    """Task that send email to all users"""
+    users = User.objects.all()
+    send_user_emails(users=users)
+    logger.debug(f"Emails were send out to {len(users)} users")
+```
 
 Celery will automatically pickup these log messages and output them in the `stdout` of the Celery Worker Process. By doing this simple change you can now follow up on the execution of your tasks and feel confident that they are being executed as expected.

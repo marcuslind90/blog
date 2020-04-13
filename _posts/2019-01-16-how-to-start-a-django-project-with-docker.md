@@ -15,57 +15,60 @@ The only prerequisite you need for this is to have Docker installed on your comp
 ## Initiate your Dockerfile and Requirements
 Let's get going with our project. The first thing we do is to setup our repository and our project folder locally on our computer.
 
-	::bash
-    mkdir project
-	// Either clone an existing repository...
-	git clone https://github.com/<user>/<repo>/ project
-	cd project
-	// or init a new repistory
-	cd project
-	git init
-	
-	touch docker-compose.yml
-	
-	mkdir src
-	cd src
-	
-	touch Dockerfile
-	touch .env
-	touch .envexample
-	mkdir requirements
-	touch requirements/base.txt
-	touch requirements/dev.txt
-	touch requirements/prod.txt
-	
+```bash
+mkdir project
+// Either clone an existing repository...
+git clone https://github.com/<user>/<repo>/ project
+cd project
+// or init a new repistory
+cd project
+git init
+
+touch docker-compose.yml
+
+mkdir src
+cd src
+
+touch Dockerfile
+touch .env
+touch .envexample
+mkdir requirements
+touch requirements/base.txt
+touch requirements/dev.txt
+touch requirements/prod.txt
+```
+
 We then edit `Dockerfile` and add the following content:
 
-	::yml
-	# The base image we want to inherit from
-	FROM python:3.7
-	ENV PYTHONUNBUFFERED 1
-	ARG ENV=dev
+```dockerfile
+# The base image we want to inherit from
+FROM python:3.7
+ENV PYTHONUNBUFFERED 1
+ARG ENV=dev
 
-	RUN mkdir /app
-	WORKDIR /app
-	ADD ./requirements /app/requirements
-	
-	# Install the pip requirements file depending on 
-	# the $ENV build arg passed in when starting build.
-	RUN pip install -Ur requirements/$ENV.txt
-	
-	# Copy the rest of our application.
-	COPY . /app/
-	
-	# Expose the application on port 8000
-	EXPOSE 8000
-	# Run test server
-	CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+RUN mkdir /app
+WORKDIR /app
+ADD ./requirements /app/requirements
+
+# Install the pip requirements file depending on 
+# the $ENV build arg passed in when starting build.
+RUN pip install -Ur requirements/$ENV.txt
+
+# Copy the rest of our application.
+COPY . /app/
+
+# Expose the application on port 8000
+EXPOSE 8000
+# Run test server
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+```
 
 We also edit our `/requirements/base.txt` file and add 
 
-    ::bash
-    django>=2.1.4
-	psycopg2-binary>=2.7.6.1
+```bash
+django>=2.1.4
+psycopg2-binary>=2.7.6.1
+```
 
 *There might be more recent version of these packages out when you're reading this article*
 
@@ -93,28 +96,29 @@ Before we build our project we also want to create a Docker Compose file that de
 
 Edit your `./docker-compose.yml` file in the root of your project folder and add the following content to it:
 
-	::yml
-	version: '3'
+```yaml
+version: '3'
 
-	services:
+services:
 
-		app:
-			build: ./src
-			restart: always
-			env_file:
-				- ./src/.env
-			ports:
-				- "8000:8000"
-			volumes:
-				- "./src/:/app/"
-			command: bash -c "python manage.py migrate --no-input &&
-							               python manage.py runserver 0.0.0.0:8000"
+    app:
+        build: ./src
+        restart: always
+        env_file:
+            - ./src/.env
+        ports:
+            - "8000:8000"
+        volumes:
+            - "./src/:/app/"
+        command: bash -c "python manage.py migrate --no-input &&
+                                        python manage.py runserver 0.0.0.0:8000"
 
-		db:
-			image: postgres:9.6
-			restart: always
-			volumes:
-				- "./volumes/db:/var/lib/postgresql/data"
+    db:
+        image: postgres:9.6
+        restart: always
+        volumes:
+            - "./volumes/db:/var/lib/postgresql/data"
+```
 
 So let's go through what all this does shall we?
 
@@ -150,12 +154,13 @@ Do you remember that we created an `.env` and `.envexample` file in the first st
 
 Add the following Environment Variables to your `.env` and `.envexample` files:
 
-	::bash
-    RDS_DB_NAME=postgres
-	RDS_HOST=db
-	RDS_PORT=5432
-	RDS_USERNAME=postgres
-	RDS_PASSWORD=
+```bash
+RDS_DB_NAME=postgres
+RDS_HOST=db
+RDS_PORT=5432
+RDS_USERNAME=postgres
+RDS_PASSWORD=
+```
 
 All of these settings are what the PostgreSQL Docker image use by default, the only thing that might be different in your case is the `RDS_HOST`. This is the host name of our database and it should be the name of our database container. In our case we named it `db` inside our `docker-compose.yml` file.
 
@@ -167,26 +172,28 @@ Finally we also want to go into our `settings.py` file to change our database ba
 
 Go to the `DATABASES = {}` section and set it to the following:
 
-	::python
-	DATABASES = {
-		'default': {
-			'ENGINE': 'django.db.backends.postgresql',
-			'NAME': os.environ.get('RDS_DB_NAME'),
-			'USER': os.environ.get('RDS_USERNAME'),
-			'PASSWORD': os.environ.get('RDS_PASSWORD'),
-			'HOST': os.environ.get('RDS_HOST'),
-			'PORT': os.environ.get('RDS_PORT'),
-		}
-	}
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('RDS_DB_NAME'),
+        'USER': os.environ.get('RDS_USERNAME'),
+        'PASSWORD': os.environ.get('RDS_PASSWORD'),
+        'HOST': os.environ.get('RDS_HOST'),
+        'PORT': os.environ.get('RDS_PORT'),
+    }
+}
+```
 
 It will use the `os` library (which is imported into the settings file by default) to read the systems environment variables and use them as string values for our `DATABASES` configuration. 
 
 You should now be able to re-run your container with the following commands:
 
-	::bash
-	docker-compose down --remove-orphans
-	docker-compose up
-	
+```bash
+docker-compose down --remove-orphans
+docker-compose up
+```
+
 Voila, now you have a Django project using a PostgreSQL database running with Docker.
 
 
@@ -195,16 +202,18 @@ Now we're done and its time to push our project to our git repository. Before we
 
 I like to use [Gitignore.io](https://www.gitignore.io/api/python,django) as a base for my `.gitignore` file but then extend it by using a few custom rules:
 
-	::bash
-	envs/  # VSCode directory where it auto finds virtualenvs 
-	/volumes  # We don't want to checkin our DB volume
-	/src/media  # We don't want to checkin our Django media files
-	/src/static  # We don't want to checkin our Django static files
-	.vscode/  # The VSCode config directory
-	
+```bash
+envs/  # VSCode directory where it auto finds virtualenvs 
+/volumes  # We don't want to checkin our DB volume
+/src/media  # We don't want to checkin our Django media files
+/src/static  # We don't want to checkin our Django static files
+.vscode/  # The VSCode config directory
+```
+
 After you've added your `.gitignore` file you should be able to push your changes to your repository with:
 
-	::bash
-	git add .
-	git commit -m "Initial commit"
-	git push
+```bash
+git add .
+git commit -m "Initial commit"
+git push
+```

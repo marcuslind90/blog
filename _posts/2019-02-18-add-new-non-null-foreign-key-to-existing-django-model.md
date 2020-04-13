@@ -16,30 +16,32 @@ It made a lot of sense to refactor this database model and to split it up into a
 
 E.g. instead of doing something like this:
 
-	::python
-	from django.db import models
+```python
+from django.db import models
 
-	class FooModel(models.Model):
-		field_a = models.IntegerField()
-		field_b = models.IntegerField()
-		field_c = models.IntegerField()
-		field_d = models.IntegerField()
-		field_that_is_updated = models.IntegerField()
+class FooModel(models.Model):
+    field_a = models.IntegerField()
+    field_b = models.IntegerField()
+    field_c = models.IntegerField()
+    field_d = models.IntegerField()
+    field_that_is_updated = models.IntegerField()
+```
 
 We could simply refactor it into something like this:
 
-	::python
-	from django.db import models
+```python
+from django.db import models
 
-	class BarModel(models.Model):
-		field_a = models.IntegerField()
-		field_b = models.IntegerField()
-		field_c = models.IntegerField()
-		field_d = models.IntegerField()
+class BarModel(models.Model):
+    field_a = models.IntegerField()
+    field_b = models.IntegerField()
+    field_c = models.IntegerField()
+    field_d = models.IntegerField()
 
-	class FooModel(models.Model):
-		parent = models.ForeignKey(BarModel, on_delete=models.CASCADE)
-		field_that_is_updated = models.IntegerField()
+class FooModel(models.Model):
+    parent = models.ForeignKey(BarModel, on_delete=models.CASCADE)
+    field_that_is_updated = models.IntegerField()
+```
 
 Note that the new `parent` field is not nullable. So what would happen to all the existing `FooModel` entries? Which `BarModel` would they point to?
 
@@ -68,21 +70,22 @@ This allows us to set up the new model while still keeping our original data in 
 
 At this point in time, our code would look something like this.
 
-	::python
-	class BarModel(models.Model):
-		field_a = models.IntegerField()
-		field_b = models.IntegerField()
-		field_c = models.IntegerField()
-		field_d = models.IntegerField()
+```python
+class BarModel(models.Model):
+    field_a = models.IntegerField()
+    field_b = models.IntegerField()
+    field_c = models.IntegerField()
+    field_d = models.IntegerField()
 
 
-	class FooModel(models.Model):
-		field_a = models.IntegerField()
-		field_b = models.IntegerField()
-		field_c = models.IntegerField()
-		field_d = models.IntegerField()
-		field_that_is_updated = models.IntegerField()
-		parent = models.ForeignKey(BarModel, on_delete=models.CASCADE, null=True)
+class FooModel(models.Model):
+    field_a = models.IntegerField()
+    field_b = models.IntegerField()
+    field_c = models.IntegerField()
+    field_d = models.IntegerField()
+    field_that_is_updated = models.IntegerField()
+    parent = models.ForeignKey(BarModel, on_delete=models.CASCADE, null=True)
+```
 
 Note that we added our new `BarModel` and we added a `ForeignKey` to it from the `FooModel` that got `null=True`. Also, note that the `field_x` fields are duplicated in both models at this point in time.
 
@@ -90,8 +93,9 @@ Note that we added our new `BarModel` and we added a `ForeignKey` to it from the
 
 Next, we want to fill the new `BarModel` table with data and point the existing `FooModel` entries to these new table rows with its `ForeignKey`. We can achieve this by creating a custom migration file that we will with our own content.
 
-	::bash
-	python manage.py makemigrations --empty myapp
+```bash
+python manage.py makemigrations --empty myapp
+```
 
 The command above will generate a new migration file to the `myapp` Django application. This newly generated file will contain an empty `operations` list that you can fill with your own actions that you wish your migration file to execute.
 
@@ -108,54 +112,57 @@ We can leverage this feature to then generate the new data on the fly and popula
 
 When you generate your new migration using the `--empty` flag, the file should end up looking something like this.
 
-	::python
-	from django.db import migrations, models
+```python
+from django.db import migrations, models
 
-	class Migration(migrations.Migration):
+class Migration(migrations.Migration):
 
-		dependencies = [
-				('myapp', '0011_auto_20190108_0750'),
-			]
+    dependencies = [
+            ('myapp', '0011_auto_20190108_0750'),
+        ]
 
-		operations = []
+    operations = []
+```
 
 We can then add a `RunPython` operation to the `operations` list that execute a custom function.
 
-	::python
-	from django.db import migrations, models
+```python
+from django.db import migrations, models
 
 
-	def create_bars(apps, schema_editor):
-		...
+def create_bars(apps, schema_editor):
+    ...
 
-	class Migration(migrations.Migration):
+class Migration(migrations.Migration):
 
-		dependencies = [
-			('myapp', '0011_auto_20190108_0750'),
-		]
+    dependencies = [
+        ('myapp', '0011_auto_20190108_0750'),
+    ]
 
-		operations = [
-			migrations.RunPython(create_bars)
-		]
+    operations = [
+        migrations.RunPython(create_bars)
+    ]
+```
 
 This means that the migration will execute the `create_bars` method when it is applied.
 
 We can then fill our new `create_bars` function with something like this:
 
-	::python
-	def create_bars(apps, schema_editor):
-		FooModel = apps.get_model('myapp', 'FooModel')
-		BarModel = apps.get_model('myapp', 'BarModel')
+```python
+def create_bars(apps, schema_editor):
+    FooModel = apps.get_model('myapp', 'FooModel')
+    BarModel = apps.get_model('myapp', 'BarModel')
 
-		for foo in FooModel.objects.all():
-			instance, _ = BarModel.objects.get_or_create(
-				field_a=foo.field_a,
-				field_b=foo.field_b,
-				field_c=foo.field_c,
-				field_d=foo.field_d,
-			)
-			foo.parent = instance
-			foo.save()
+    for foo in FooModel.objects.all():
+        instance, _ = BarModel.objects.get_or_create(
+            field_a=foo.field_a,
+            field_b=foo.field_b,
+            field_c=foo.field_c,
+            field_d=foo.field_d,
+        )
+        foo.parent = instance
+        foo.save()
+```
 
 So what does this function do? Well, we loop through all of our `FooModel` entries and we set its `parent` field to a newly created `BarModel` entry. Note that we use `get_or_create`, this means that we avoid creating multiple duplicate `BarModel` entries and we reuse them for many `foo` instances.
 
@@ -165,25 +172,27 @@ After this migration is run, we should have populated all required `BarModel` en
 
 At this point in time, all of our existing `FooModel` should point to a `BarModel` and even though the field is `null=True`, no entries should have a null value. This means that we are now ready to finalize the state of our models by updating it to its final version.
 
-	::python
-	class BarModel(models.Model):
-		field_a = models.IntegerField()
-		field_b = models.IntegerField()
-		field_c = models.IntegerField()
-		field_d = models.IntegerField()
+```python
+class BarModel(models.Model):
+    field_a = models.IntegerField()
+    field_b = models.IntegerField()
+    field_c = models.IntegerField()
+    field_d = models.IntegerField()
 
 
-	class FooModel(models.Model):
-		field_that_is_updated = models.IntegerField()
-		parent = models.ForeignKey(BarModel, on_delete=models.CASCADE)
+class FooModel(models.Model):
+    field_that_is_updated = models.IntegerField()
+    parent = models.ForeignKey(BarModel, on_delete=models.CASCADE)
+```
 
 As you can see from the code example above, we now removed `null=True` from the `FooModel.parent` field, and we also removed the old `field_x` fields on the `FooModel` model. This will obviously delete all those fields from the database, and we will lose that data, but since our previous custom migration already migrated the data to a new `BarModel` entry, we should now be safe.
 
 At this point you should be able to generate your final migration file and then apply all of these migrations with the following commands:
 
-	::bash
-	python manage.py makemigrations
-	python manage.py migrate
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
 
 ## Summary of adding new ForeignKey to Django
 

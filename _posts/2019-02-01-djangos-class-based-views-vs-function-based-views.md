@@ -12,14 +12,15 @@ For any beginner who starts reading through the [Django Documentation](https://d
 
 For example
 
-	::python
-	from django.http import HttpResponse
+```python
+from django.http import HttpResponse
 
-	def index(request):
-		if request.method == "GET":
-			return HttpResponse("Hello World")
-		elif request.method == "POST":
-			return HttpResponse("Hello World")
+def index(request):
+    if request.method == "GET":
+        return HttpResponse("Hello World")
+    elif request.method == "POST":
+        return HttpResponse("Hello World")
+```
 
 As you can see, it's extremely simple and you can generate a view that will return a proper response in just a handful of lines of code. This was the first way of creating views in Django, and since it was the first, and also the simplest, it's also probably the reason why the documentation choose to introduce beginners to it right from the get-go.
 
@@ -27,16 +28,17 @@ The only problem with function based views is that you don't get much for free w
 
 Because of this, the Django contributors decided to introduce something that they called Class-Based Views. As you can infer from the name, instead of defining views as a function, we can instead define it as a class.
 
-	::python
-	from django.http import HttpResponse
-	from django.views.generic import View
+```python
+from django.http import HttpResponse
+from django.views.generic import View
 
-	class IndexView(View):
-		def get(self, request, *args, **kwargs):
-			return HttpResonse("Hello World")
+class IndexView(View):
+    def get(self, request, *args, **kwargs):
+        return HttpResonse("Hello World")
 
-		def post(self, request, *args, **kwargs):
-			return HttpResonse("Hello World")
+    def post(self, request, *args, **kwargs):
+        return HttpResonse("Hello World")
+```
 
 By looking at the examples you can see that they both achieve the same thing, they take requests and they route the action based on what kind of HTTP Method that is being used. 
 
@@ -57,36 +59,37 @@ Most of the item on our list are things that we want to be done on almost every 
 
 A more realistic example of a function based view might be something like the code example below.
 
-	::python
-	from django.http import Http404
-	from django.shortcuts import render, get_object_or_404
-	from polls.models import Poll
-	from .forms import PollForm
+```python
+from django.http import Http404
+from django.shortcuts import render, get_object_or_404
+from polls.models import Poll
+from .forms import PollForm
 
 
-	def detail(request, poll_id):
-		context = get_template_context(poll_id)
+def detail(request, poll_id):
+    context = get_template_context(poll_id)
 
-		if request.method == "POST":
-			form = PollForm(request.POST)
-			if form.is_valid():
-				Poll.objects.create(**form.cleaned_data)
-				return HttpResponseRedirect('/thanks/')
-		else:
-			form = PollForm()
-		
-		context["form"] = form
-		return render(request, 'polls/detail.html', context)
-	
-	def get_template_context(poll_id):
-		poll = get_object_or_404(Poll, pk=poll_id)
-		return {
-			"poll": poll,
-			"meta": {
-				"title": poll.name,
-				"description": " ".join(poll.description.split(" ")[:25]),poll.description
-			},
-		}
+    if request.method == "POST":
+        form = PollForm(request.POST)
+        if form.is_valid():
+            Poll.objects.create(**form.cleaned_data)
+            return HttpResponseRedirect('/thanks/')
+    else:
+        form = PollForm()
+    
+    context["form"] = form
+    return render(request, 'polls/detail.html', context)
+
+def get_template_context(poll_id):
+    poll = get_object_or_404(Poll, pk=poll_id)
+    return {
+        "poll": poll,
+        "meta": {
+            "title": poll.name,
+            "description": " ".join(poll.description.split(" ")[:25]),poll.description
+        },
+    }
+```
 
 That example is just to process a form and to add some metadata such as a title and description to our template context. You can imagine that these tasks will be repeated over and over and over again for each View that you create within your application.
 
@@ -121,16 +124,17 @@ They all fill the need for some very common tasks. For example, the `TemplateVie
 
 We could easily clean up our previous Function-Based View example with the following code:
 
-	::python
-	from django.views.generic import CreateView
-	from .models import Poll
-	from .mixins import MetaMixin
+```python
+from django.views.generic import CreateView
+from .models import Poll
+from .mixins import MetaMixin
 
-	
-	class PollDetailView(MetaMixin, CreateView):
-		template_name = "polls/poll.html"
-		model = Poll
-	
+
+class PollDetailView(MetaMixin, CreateView):
+    template_name = "polls/poll.html"
+    model = Poll
+```
+
 These 3 lines of code would allow us to automatically implement the following things:
 
 - `MetaMixin` can be a custom mixin that automatically populates the meta attributes of your view if an object is present. For example, it could use the string representation of the object to make a Meta title automatically.

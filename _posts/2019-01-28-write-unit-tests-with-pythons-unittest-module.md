@@ -30,12 +30,13 @@ Personally, I prefer using Python's built-in `unittest` module. It gives us all 
 
 Let's write a simple example:
 
-	::python
-	from unittest import TestCase
+```python
+from unittest import TestCase
 
-	class FooTestCase(TestCase):
-		def test_foo(self):
-			self.assertTrue(1 + 1 == 2, "1+1 should be 2.")
+class FooTestCase(TestCase):
+    def test_foo(self):
+        self.assertTrue(1 + 1 == 2, "1+1 should be 2.")
+```
 
 Let's summarize what we're doing here:
 
@@ -45,17 +46,19 @@ Let's summarize what we're doing here:
 
 We can then run this from bash with a single command. If we saved the code above in a file called `main.py` we can call it in the following manner:
 
-	::bash
-	python -m unittest main
+```bash
+python -m unittest main
+```
 
 You will then see some output like this:
 
-	::bash
-	.
-	-------------------------------------
-	Ran 1 test in 0.000s
+```bash
+.
+-------------------------------------
+Ran 1 test in 0.000s
 
-	OK
+OK
+```
 
 ### What is a TestCase?
 A "Test Case" is a collection of unit tests in Python that all test the same cluster of features. If you do object-oriented programming, it's pretty common to have a Test Case per Class in your code base.
@@ -84,26 +87,27 @@ Instead of doing this mess, we can simply define all of this within the `setUp()
 
 For example:
 
-	::python
-	from unittest import TestCase
+```python
+from unittest import TestCase
 
-	class CarTestCase(TestCase):
-		def setUp(self):
-	                material=Material()
-			color = Color()
-			wheel_type = WheelType()
-			self.car = Car(
-				material=material,
-				color=color,
-				wheel_type=wheel_type,
-			)
+class CarTestCase(TestCase):
+    def setUp(self):
+                material=Material()
+        color = Color()
+        wheel_type = WheelType()
+        self.car = Car(
+            material=material,
+            color=color,
+            wheel_type=wheel_type,
+        )
 
-		def test_foo(self):
-			self.assertEqual(
-				self.car.wheel_count, 
-				4, 
-				"A car should have 4 wheels."
-			)
+    def test_foo(self):
+        self.assertEqual(
+            self.car.wheel_count, 
+            4, 
+            "A car should have 4 wheels."
+        )
+```
 
 Note that the `setUp()` and `tearDown()` methods will be executed before and after each `test_` method. This means that if your test modifies the objects defined within the `setUp` method, the next `test_` method will still get a fresh instance. 
 
@@ -119,8 +123,9 @@ Remember that output that I showed you above that returned the number of tests a
 ### How to run Python Unit Tests?
 You can run all of your unit tests with a single command.
 
-	::bash
-	python -m unittest
+```bash
+python -m unittest
+```
 
 That will create a `TestRunner` that will try to execute all of your test cases and test methods. But how does the `unittest` module know which files to look for and which methods to execute?
 
@@ -133,8 +138,9 @@ By following those naming standards, the Python `unittest` module will automatic
 
 If you want to run a specific file instead of relying on the automatic discovery that will execute all your tests, you can provide a python path to the file that you want to test.
 
-	::bash
-	python -m unittest apps.foo.bar
+```bash
+python -m unittest apps.foo.bar
+```
 
 That will limit the testing to the provided python module. This can be extremely useful if you're attempting to fix some tests in a specific module and you want to iterate quickly on your unit tests without having to run your complete test suite.
 
@@ -143,8 +149,9 @@ The Auto Discovery is the process of allowing the `TestRunner` to automatically 
 
 The test runner automatically enables the discovery functionality whenever you call it without arguments (like in our example above in the previous section) but you can also explicitly use the Automatic Discovery in the following manner:
 
-	::bash
-	python -m unittest discover
+```bash
+python -m unittest discover
+```
 
 That will allow you to also provide custom options and flags to the `discover` command such as `--pattern`, `--start-directory` or `--top-level-directory` to control how and where the automatic discovery will attempt to discover the tests.
 
@@ -168,23 +175,24 @@ If we want to save ourselves a lot of typing though, we can just use the built-i
 
 Let's write an example:
 
-	::python
-	from unittest import TestCase
-	from unittest.mock import Mock
+```python
+from unittest import TestCase
+from unittest.mock import Mock
 
-	class FooTestCase(TestCase):
-		def test_foo(self):
-			db_mock = Mock()
-			db_mock.execute.return_value = True
-			res = foo(db=db_mock)
-			self.assertTrue(res, "Result should be True")
-	
-	def foo(db):
-		res = db.execute("INSERT INTO foo (name) VALUES ('bar');")
-		if res:
-			return True
-		else:
-			return False
+class FooTestCase(TestCase):
+    def test_foo(self):
+        db_mock = Mock()
+        db_mock.execute.return_value = True
+        res = foo(db=db_mock)
+        self.assertTrue(res, "Result should be True")
+
+def foo(db):
+    res = db.execute("INSERT INTO foo (name) VALUES ('bar');")
+    if res:
+        return True
+    else:
+        return False
+```
 
 In the example above, we are writing a unit test that tests our `foo()` method. As you can see the `foo()` method is attempting to write something to the database, which we don't want to happen during our unit test.
 
@@ -199,28 +207,29 @@ This is where "Patching" comes in. By using patching, we can create an isolated 
 
 Let's rewrite our previous example into a version that doesn't expose the database adapter in the method signature, and then lets mock it using Patch.
 
-	::python
-	# File test.py
-	from unittest import TestCase
-	from unittest.mock import patch, Mock
-	
+```python
+# File test.py
+from unittest import TestCase
+from unittest.mock import patch, Mock
 
-	class FooTestCase(TestCase):
-		@patch("app.db")
-		def test_foo(self, db_mock: Mock):
-			db_mock.execute.return_value = True
-			res = foo()
-			self.assertTrue(res, "Result should be True")
-	
-	# File app.py
-	from customdb import db
 
-	def foo():
-		res = db.execute("INSERT INTO foo (name) VALUES ('bar');")
-		if res:
-			return True
-		else:
-			return False
+class FooTestCase(TestCase):
+    @patch("app.db")
+    def test_foo(self, db_mock: Mock):
+        db_mock.execute.return_value = True
+        res = foo()
+        self.assertTrue(res, "Result should be True")
+
+# File app.py
+from customdb import db
+
+def foo():
+    res = db.execute("INSERT INTO foo (name) VALUES ('bar');")
+    if res:
+        return True
+    else:
+        return False
+```
 
 As you can see, by using the `@patch` decorator, we can get a mock instance of the `db` instance used within `app` and then pass it into our test, so that we can set the expected mock values. This is extremely powerful and it means that unlike some other languages where you *must use dependency injection* to be able to write proper unit tests, with the Python `unittest` module, we can simply reach into our code and mock objects without necessarily exposing them through method signatures.
 
@@ -231,24 +240,25 @@ So far in this article, we have learned how to test the response of a method. Bu
 
 For example, let's say that we have the `foo()` method in our example above, but instead of returning True or False based on if it was successful or not, all we want to do is to test that the `db.execute()` method was called once.
  
-	::python
-	# File test.py
-	from unittest import TestCase
-	from unittest.mock import patch, Mock
-    
+```python
+# File test.py
+from unittest import TestCase
+from unittest.mock import patch, Mock
 
-	class FooTestCase(TestCase):
-		@patch("app.db")
-		def test_foo(self, db_mock: Mock):
-			foo()
-        	db_mock.execute.assert_called_once()
 
-    
-	# File app.py
-	from customdb import db
+class FooTestCase(TestCase):
+    @patch("app.db")
+    def test_foo(self, db_mock: Mock):
+        foo()
+        db_mock.execute.assert_called_once()
 
-	def foo():
-		db.execute("INSERT INTO foo (name) VALUES ('bar');")
+
+# File app.py
+from customdb import db
+
+def foo():
+    db.execute("INSERT INTO foo (name) VALUES ('bar');")
+```
 
 As you can see, the `db_mock` variable which is of type `Mock` can use methods such as `.assert_called_once()` on any of its attributes, properties or methods to create an assert that checks if the callable was called in some specific manner.
 

@@ -23,9 +23,10 @@ Handy, right?
 
 In my case I was running PostgreSQL in a Docker container so my `~/backup.sh` script ended up looking like this:
 
-	::bash
-	#!/bin/bash
-	docker exec $(docker ps -q) pg_dump dbname -U dbuser | gzip > /backup/backup.sql.gz
+```bash
+#!/bin/bash
+docker exec $(docker ps -q) pg_dump dbname -U dbuser | gzip > /backup/backup.sql.gz
+```
 	
 This would then run the `pg_dump` command within my docker container and store it within the containers `/backup` folder. Since I mounted this volume to the host machine, it means that this new `backup.sql.gz` was also available on the host machine where the script was running.
 
@@ -34,28 +35,31 @@ I found a handy little tool called [rclone](https://rclone.org/) which calls its
 
 I installed it on my DigitalOcean Ubuntu droplet with the following command:
 
-	::bash
-	curl https://rclone.org/install.sh | sudo bash
+```bash
+curl https://rclone.org/install.sh | sudo bash
+```
 	
 After installing I had to create a `~/rclone.conf` file that I populated with the following settings that would allow me to authenticate with DigitalOcean Spaces and upload my backup file to it using the S3 protocol. As you can see the `${SPACES_ACCESS_KEY}` and `${SPACES_SECRET_KEY}` is environment variables that hold my secret keys required to authenticate with my storage.
 
-	::bash
-	[spaces]
-	type = s3
-	env_auth = false
-	access_key_id = ${SPACES_ACCESS_KEY}
-	secret_access_key = ${SPACES_SECRET_KEY}
-	endpoint = sfo2.digitaloceanspaces.com
-	acl = private
+```bash
+[spaces]
+type = s3
+env_auth = false
+access_key_id = ${SPACES_ACCESS_KEY}
+secret_access_key = ${SPACES_SECRET_KEY}
+endpoint = sfo2.digitaloceanspaces.com
+acl = private
+```
 	
 At this point I just had to add `rclone` to my `~/backup.sh` file described in the previous section and after that my final script was done and was looking like this:
 
-	::bash
-	#!/bin/bash
-	mkdir -p /backup
-	docker exec $(docker ps -q) pg_dump dbname -U dbuser | gzip > /backup/backup.sql.gz
-	rclone --config ~/rclone.conf mkdir "spaces:myspaces/backups/$(date +%d)"
-	rclone --config ~/rclone.conf copy /backup "spaces:myspaces/backups/$(date +%d)"
+```bash
+#!/bin/bash
+mkdir -p /backup
+docker exec $(docker ps -q) pg_dump dbname -U dbuser | gzip > /backup/backup.sql.gz
+rclone --config ~/rclone.conf mkdir "spaces:myspaces/backups/$(date +%d)"
+rclone --config ~/rclone.conf copy /backup "spaces:myspaces/backups/$(date +%d)"
+```
 
 So to quickly summarize what this script does line by line:
 
@@ -75,8 +79,9 @@ A cronjob is a scheduled command that reoccurs at a defined schedule. This can b
 
 I created a `/etc/cron.d/backup-cron` file that contained the following content:
 
-	::bash
-	0 0 * * * sh ~/backup.sh
+```bash
+0 0 * * * sh ~/backup.sh
+```
 
 I then add this to my droplet's crontab by executing `crontab /etc/cron.d/backup-cron`. You can check if it has been added to your crontab by typing `crontab -e` to see existing cronjobs on your server instance.
 

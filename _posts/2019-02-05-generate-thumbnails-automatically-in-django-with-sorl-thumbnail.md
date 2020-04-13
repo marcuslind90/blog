@@ -75,11 +75,12 @@ The installation process of the package is incredibly easy, but it does require 
 
 First of all, you need to have some kind of image engine installed on your system so that you can interact and generate images. If you are using Django's `ImageField`, you probably already have `Pillow` installed. If not you need to follow the following steps (Ubuntu):
 
-	::bash
-	sudo apt-get install libjpeg62 libjpeg62-dev zlib1g-dev
-   	# There might be a more recent version 
-   	# when you read this article.
-	pip install Pillow>=5.4.0
+```bash
+sudo apt-get install libjpeg62 libjpeg62-dev zlib1g-dev
+# There might be a more recent version 
+# when you read this article.
+pip install Pillow>=5.4.0
+```
 
 If you don't want to use Pillow, you can choose any of the other supported engines such as:
 
@@ -89,18 +90,20 @@ If you don't want to use Pillow, you can choose any of the other supported engin
 
 After you have installed any dependencies, you can install the sorl-thumbnail python package using pip.
 
-	::bash
-	# There might be a more recent version 
-	# when you read this article.
-	pip install sorl-thumbnail>=12.5.0
+```bash
+# There might be a more recent version 
+# when you read this article.
+pip install sorl-thumbnail>=12.5.0
+```
 
 Finally, you need to add it to your settings `INSTALLED_APPS` list 
 
-	::python
-	INSTALLED_APPS = [
-		...
-		'sorl.thumbnail',
-	]
+```python
+INSTALLED_APPS = [
+    ...
+    'sorl.thumbnail',
+]
+```
 
 That's it! At this point, you should be able to start using the sorl-thumbnail package in your application.
 
@@ -109,13 +112,14 @@ The way you generate thumbnails using this package is by adding special template
 
 For example, if our user object has a `profile` property, we tell `sorl-thumbnail` to replace this reference with a new object that contains data of the generated thumbnail instead.
 
-	::html
-    {% raw %}
-	{% load thumbnail %}
-	{% thumbnail user.get_avatar_url "70x70" crop="center" as im %}
-            <img src="{{im.url}}" height="{{im.height}}" width="{{im.width}}">
-	{% endthumbnail %}
-    {% endraw %}
+```html
+{% raw %}
+{% load thumbnail %}
+{% thumbnail user.get_avatar_url "70x70" crop="center" as im %}
+        <img src="{{im.url}}" height="{{im.height}}" width="{{im.width}}">
+{% endthumbnail %}
+{% endraw %}
+```
 
 As you can see in the example above, our original file reference comes from the `user.get_avatar_url` function call. In this case, we replace that with an `im` object that contains the newly generated thumbnail in 70x70 format.
 
@@ -128,8 +132,9 @@ We can achieve this by specifying "Alternative Resolutions" for our thumbnails. 
 
 First, we need to specify which additional resolutions we want to generate thumbnails for. This is done by adding the following option to your settings file.
 
-	::python
-	THUMBNAIL_ALTERNATIVE_RESOLUTIONS = [2, ]
+```python
+THUMBNAIL_ALTERNATIVE_RESOLUTIONS = [2, ]
+```
 
 Note that you can provide a list of values, 2 in this case, means that we want to generate thumbnails 2x the size of the specified value. This means that if we want to display our thumbnail as 70x70, we also generate a 140x140 version of it.
 
@@ -139,13 +144,14 @@ This filter is available as long as you have loaded the thumbnail template tags 
 
 The final look of our template code that use the resolution filter syntax to load the 2x alternative resolution would be the following:
 
-	::html
-    {% raw %}
-	{% load thumbnail %}
-   	{% thumbnail user.get_avatar_url "70x70" crop="center" as im %}
-           	<img src="{{im.url|resolution:'2x'}}" height="{{im.height}}" width="{{im.width}}">
-	{% endthumbnail %}
-    {% endraw %}
+```html
+{% raw %}
+{% load thumbnail %}
+{% thumbnail user.get_avatar_url "70x70" crop="center" as im %}
+        <img src="{{im.url|resolution:'2x'}}" height="{{im.height}}" width="{{im.width}}">
+{% endthumbnail %}
+{% endraw %}
+```
 
 ### Configuration and Common Problems
 It's incredibly easy to get going with the sorl-thumbnail package, but sometimes you might want to add some kind of custom configuration to alter the default behavior.
@@ -156,31 +162,32 @@ There you can do things such as changing the Key-Value Store backend, enabling D
 
 If you run into any issues with the module, the main thing I'd recommend you to do is to enable logging to improve the ease of debugging the issue. This can easily be done by adding the following to your settings file:
 
-	::python
-	LOGGING = {
-   		'version': 1,
-		'disable_existing_loggers': False,
-   		'formatters': {
-			'simple': {
-				'format': '{levelname} {asctime} {module} - {message}',
-    	       		'style': '{'
-			}
-   		},
-		'handlers': {
-       		'stream': {
-           			'level': 'DEBUG',
-           			'class': 'logging.StreamHandler',
-           			'formatter': 'simple',
-       		}
-		},
-   		'loggers': {
-       		'sorl.thumbnail': {
-           			'handlers': ['stream', ],
-           			'level': 'DEBUG',
-           			'propagate': True
-       		}
-    		}
-	}
+```python
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '{levelname} {asctime} {module} - {message}',
+                'style': '{'
+        }
+    },
+    'handlers': {
+        'stream': {
+                'level': 'DEBUG',
+                'class': 'logging.StreamHandler',
+                'formatter': 'simple',
+        }
+    },
+    'loggers': {
+        'sorl.thumbnail': {
+                'handlers': ['stream', ],
+                'level': 'DEBUG',
+                'propagate': True
+        }
+    }
+}
+```
 
 This would then output any log entries of DEBUG level or higher using the StreamHandler.
 
@@ -190,7 +197,8 @@ For some reason, the sorl-thumbnail package was ignoring all the GET parameters 
 
 This particular setting could be controlled by setting the following options.
 
-	::python
-	THUMBNAIL_REMOVE_URL_ARGS = False
+```python
+THUMBNAIL_REMOVE_URL_ARGS = False
+```
 
 If you encounter any other issues related to settings that might not be documented, I suggest that you contribute to the open source package by creating a pull request that adds any missing documentation.

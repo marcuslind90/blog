@@ -28,12 +28,13 @@ For the sake of simplicity, I will use `send_task()` in my code examples below.
 
 For example.
 
-	::python
-	@app.task
-	def success_callback(response):
-		print("Processing task finished successfully!")
+```python
+@app.task
+def success_callback(response):
+    print("Processing task finished successfully!")
 
-	app.send_task("remote.processing", link=success_callback.s())
+app.send_task("remote.processing", link=success_callback.s())
+```
 
 A few things to note here:
 - The `success_callback` task receives a `response` kwarg, but we are not passing it any value when we set its signature to the `link` parameter. So how does response get passed in?
@@ -52,15 +53,16 @@ When we define a chained task using `link`, what we are actually doing is tellin
 So let's say that we extend our previous example to look like this:
 
 
-	::python
-	@app.task
-	def success_callback(response, file_id):
-		file = File.objects.get(pk=file_id)
-		file.status = "SUCCESS"
-		file.save()
-	
-	file_id = 1
-	app.send_task("remote.processing", link=success_callback.s(file_id))
+```python
+@app.task
+def success_callback(response, file_id):
+    file = File.objects.get(pk=file_id)
+    file.status = "SUCCESS"
+    file.save()
+
+file_id = 1
+app.send_task("remote.processing", link=success_callback.s(file_id))
+```
 
 In this example, the `remote.processing` has no concept of our applications database and model structure, so it might not even know that there is a `File` model. But still, it will know which ID to pass back to the `success_callback` because we pass it a pre-defined signature that contains it. The signature was defined on the origin system but called from the remote system.
 
@@ -76,9 +78,10 @@ Unlike the `link` signatures which gets called as tasks and passed back into the
 
 For example, imagine that System A calls a task in the following manner:
 
-	::python
-	from .tasks import error_callback
-	app.send_task("system_b.foo", link_error=error_callback.si())
+```python
+from .tasks import error_callback
+app.send_task("system_b.foo", link_error=error_callback.si())
+```
 
 As you can see, the `error_callback` task is defined on the client side from where we call the task. What will happen here is that if `system_b.foo` task fails, it will attempt to call `error_callback` from its own worker, which will raise an `NotRegistered` error since the task is not defined within the System B's worker.
 
@@ -88,27 +91,29 @@ There is a hacky solution to this though. By defining the `link_error` callbacks
 
 So you could do something like this:
 
-	::python
-	from .tasks import error_callback
-	app.send_task("system_b.foo", link_error=(error_callback.si() | error_callback.si())
+```python
+from .tasks import error_callback
+app.send_task("system_b.foo", link_error=(error_callback.si() | error_callback.si())
+```
 
 Ugly? Yes. Hacky? Yes. Does it work? Yes.
 
 To clean things up and avoid confusing to other developers, I suggest that you separate this into a utility function with a dummy task (to avoid calling the same signature twice).
 
-	::python
-	@app.task
-	def dummy():
-		"""Dummy task that does nothing to be used in error util function"""
-		pass
-	
-	def force_error_task(signature: Signature):
-		"""Turn signature into chain, to force delayed calls of task"""
-		if not signature.immutable:
-			raise ValueError("Signatures in callbacks should be immutable)
-		return (signature | dummy.si())
-		
-	app.send_task("system_b.foo", link_error=force_error_task(error_callback.si()))
+```python
+@app.task
+def dummy():
+    """Dummy task that does nothing to be used in error util function"""
+    pass
+
+def force_error_task(signature: Signature):
+    """Turn signature into chain, to force delayed calls of task"""
+    if not signature.immutable:
+        raise ValueError("Signatures in callbacks should be immutable)
+    return (signature | dummy.si())
+    
+app.send_task("system_b.foo", link_error=force_error_task(error_callback.si()))
+```
 
 Note the use of `.si()` instead of `.s()`. The difference between these two methods to create a `Signature` object is that `.si()` makes the signature immutable.
 
@@ -121,30 +126,32 @@ In this case, you can treat it similar to the `link` argument with one major dif
 
 For example you could do something like this:
 
-	::python
-	@app.task
-	def log_error(request, exc, traceback):
-		logger.error(f"{exc} - {traceback}"
+```python
+@app.task
+def log_error(request, exc, traceback):
+    logger.error(f"{exc} - {traceback}"
 
-	foo_task.apply_async(link_error=log_error.s())
+foo_task.apply_async(link_error=log_error.s())
+```
 
 ## Awaiting the Response Synchronously
 A note that is worth to mention is that you do not necessarily need to call a Celery task asynchronously and respond to it with Callbacks, Celery allows you to await the response and block any other execution while doing so. Meaning, it treats the task as a normal synchronous call.
 
 This can be achieved using the `Task.get()` method.
 
-	::python
-	@app.task(name="foo_task")
-	def foo():
-		return "bar"
+```python
+@app.task(name="foo_task")
+def foo():
+    return "bar"
 
-	# Call asynchronous
-	response = app.send_task("foo_task")
-    print(response)  # <AsyncResult>
+# Call asynchronous
+response = app.send_task("foo_task")
+print(response)  # <AsyncResult>
 
-	# Call synchronous
-	response = app.send_task("foo_task").get()
-	print(response)  # "bar"
+# Call synchronous
+response = app.send_task("foo_task").get()
+print(response)  # "bar"
+```
 
 This might look at bit weird to you, why would we want to leverage Celery if we want to await the response in a synchronous manner? Isn't the whole point of using Celery to use it with processes or tasks that take too long to execute synchronously and instead we want to do it as a background task and get the result later?
 

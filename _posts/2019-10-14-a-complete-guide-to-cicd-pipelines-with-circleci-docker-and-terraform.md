@@ -43,26 +43,27 @@ CircleCI understands the pipeline that it should execute based on the CircleCI c
 
 The initial config to start of with for our case will be:
 
-    ::yaml
-    version: 2
+```yaml
+version: 2
 
-    jobs:
-        build:
-            working_directory: ~/workspace
-            docker:
-                - image: circleci/python:3.6.4
-                   environment:
-                       RDS_DB_NAME: circleci
-                       RDS_HOST: localhost
-                       RDS_PORT: 5432
-                       RDS_USERNAME: root
-                       RDS_PASSWORD:
-                - image: circleci/postgres:9.6
-                   environment:
-                       POSTGRES_USER: root
-                       POSTGRES_DB: circleci
-        steps:
-            - checkout
+jobs:
+    build:
+        working_directory: ~/workspace
+        docker:
+            - image: circleci/python:3.6.4
+                environment:
+                    RDS_DB_NAME: circleci
+                    RDS_HOST: localhost
+                    RDS_PORT: 5432
+                    RDS_USERNAME: root
+                    RDS_PASSWORD:
+            - image: circleci/postgres:9.6
+                environment:
+                    POSTGRES_USER: root
+                    POSTGRES_DB: circleci
+    steps:
+        - checkout
+```
 
 All we are doing here is setting up the environment required for us to run our pipeline on. In our case, we are testing this specific website which depends on a PostgreSQL database and a Python 3.6 image.
 
@@ -79,12 +80,13 @@ In the case of my pipeline, I split up the dependencies required for my applicat
 
 To install the dependencies, I add the following to my `steps` key. Note that the `...` is simply there to shorten the code example and hide the other steps that have already been defined.
 
-    ::yaml
-    steps:
-        ...
-		run:
-	        name: Install dependencies.
-                command: sudo pip install -Ur requirements.txt
+```yaml
+steps:
+    ...
+    run:
+        name: Install dependencies.
+            command: sudo pip install -Ur requirements.txt
+```
 
 As mentioned above, this `requirements.txt` file includes all my `pip` dependencies that are required to lint, test and run my application.
 
@@ -93,15 +95,16 @@ After installing our dependencies it is time to do our first checks. The first t
 
 A linter is a static analysis tool that allows us to easily catch simply errors such as styling mistakes, syntax errors or logical errors such as passing in the wrong type of variable into a function that expects something else.
 
-    ::yaml
-    steps:
-        ...
-        run:
-            name: Run linter.
-            working_directory: ~/workspace/src
-            command: |
-                mkdir -p test-reports/flake8
-                flake8 . --output-file=test-reports/flake8/flake8.txt
+```yaml
+steps:
+    ...
+    run:
+        name: Run linter.
+        working_directory: ~/workspace/src
+        command: |
+            mkdir -p test-reports/flake8
+            flake8 . --output-file=test-reports/flake8/flake8.txt
+```
 
 There are multiple things to note about this section:
 
@@ -127,29 +130,31 @@ On top of that, we also want to generate a coverage report that informs us of th
 
 After making sure that both of these dependencies are installed and included in our `requirements.txt` file, we simply run it (with Django's build in management test command) with the following definition:
 
-    ::yaml
-    steps:
-        ...
-		run:
-			name: Run tests.
-			working_directory: ~/workspace/src
-			command: coverage run manage.py test
+```yaml
+steps:
+    ...
+    run:
+        name: Run tests.
+        working_directory: ~/workspace/src
+        command: coverage run manage.py test
+```
 
 Within our Django config, we define that the test report is stored within `./test-reports/unittest` folder which just like the `flake8` output is namespaced with a `/unittest/` folder. 
 
 ## Generate JUnit Flake8 Reports and Coverage HTML Reports
 After we have executed our linter, and ran all of our tests, it is now time to finalize the test report output. The unittest report is already formatted within the JUnit format, but the flake8 output is still plain text, and we have still not generated anything from our `coverage` command.
 
-    ::yaml
-    steps:
-        ...
-		run:
-	        name: Create Test Reports.
-            working_directory: ~/workspace/src
-            command: |
-				flake8_junit test-reports/flake8/flake8.txt test-reports/flake8/flake8_junit.xml
-				coverage html -d test-reports/coverage
-			when: always
+```yaml
+steps:
+    ...
+    run:
+        name: Create Test Reports.
+        working_directory: ~/workspace/src
+        command: |
+            flake8_junit test-reports/flake8/flake8.txt test-reports/flake8/flake8_junit.xml
+            coverage html -d test-reports/coverage
+        when: always
+```
 
 By using the tool `flake8-junit-report` ([PyPi](https://pypi.org/project/flake8-junit-report/)) we can convert the plain text output that we stored earlier in the `flake8` step into JUnit XML format. Note that we store it within the same folder namespaced with `/flake8/`.
 
@@ -165,15 +170,16 @@ Note that we also write `when: always`. This means that this step will execute n
 
 Finally, to make sure that our pipeline actually uploads and store these reports so that they can be viewed after the pipeline has finished executing, you must add the following steps to the bottom of your pipeline.
 
-    ::yaml
-    steps:
-        ...
-        - store_test_results:
-                path: myapp/test-reports
+```yaml
+steps:
+    ...
+    - store_test_results:
+            path: myapp/test-reports
 
-        - store_artifacts:
-                path: myapp/test-reports
-                destination: tr1
+    - store_artifacts:
+            path: myapp/test-reports
+            destination: tr1
+```
 
 ## Setup SSH Keys and Docker Commands in CircleCI Pipeline
 The steps so far have been things that we want to execute with every branch that has commits coming into it. We always want to lint and test our code. Next up will be steps related to packaging, building and deploying our application. This will only be done on the `master` branch.
@@ -182,16 +188,17 @@ To prepare for those steps, it is now time to install any dependencies that are 
 
 First of all, make sure that you add the following steps to the top of your `steps` list.
 
-    ::yaml
-    steps:
-		- checkout
+```yaml
+steps:
+    - checkout
 
-        - setup_remote_docker:
-                docker_layer_caching: yes
+    - setup_remote_docker:
+            docker_layer_caching: yes
 
-        - add_ssh_keys:
-                fingerprints:
-                    - 97:72:82:74:n2:29:12:fa:3f:hd:fk:14:a2:63:6c:ec
+    - add_ssh_keys:
+            fingerprints:
+                - 97:72:82:74:n2:29:12:fa:3f:hd:fk:14:a2:63:6c:ec
+```
 
 The `setup_remote_docker` command simply enables us to use Docker commands such as `build`, `push`, `login` in future steps.
 
@@ -214,42 +221,44 @@ Unfortunately, Terraform and Packer are not as easy to install and instead it re
 
 The final step that installs the dependencies are:
 
-    ::yaml
-    steps:
-        ...
-		run:
-			name: Install Deployment Dependencies.
-			command: |
- 	           if [ "${CIRCLE_BRANCH}" == "master" ]; then
-					sudo bash resources/dependencies.sh
-					sudo pip install ansible docker
-				fi
+```yaml
+steps:
+    ...
+    run:
+        name: Install Deployment Dependencies.
+        command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                sudo bash resources/dependencies.sh
+                sudo pip install ansible docker
+            fi
+```
 
 Note that we wrap the command in an if statement that makes sure it only executes on the master branch.
 
 The script `dependencies.sh` look like the following:
 
-    ::bash
-    #!/bin/bash
-    set -e
-    CIRCLECI_CACHE_DIR="/usr/local/bin"
-    PACKER_VERSION="1.4.2"
-    PACKER_URL="https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip"
-    TERRAFORM_VERSION="0.12.10"
-    TERRAFORM_URL="https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
+```bash
+#!/bin/bash
+set -e
+CIRCLECI_CACHE_DIR="/usr/local/bin"
+PACKER_VERSION="1.4.2"
+PACKER_URL="https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip"
+TERRAFORM_VERSION="0.12.10"
+TERRAFORM_URL="https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
 
-    if [ ! -f "${CIRCLECI_CACHE_DIR}/packer" ] || [[ ! "$(packer version)" =~ "Packer v${PACKER_VERSION}" ]]; then
-        wget -O /tmp/packer.zip "${PACKER_URL}"
-        unzip -oud "${CIRCLECI_CACHE_DIR}" /tmp/packer.zip
-    fi
+if [ ! -f "${CIRCLECI_CACHE_DIR}/packer" ] || [[ ! "$(packer version)" =~ "Packer v${PACKER_VERSION}" ]]; then
+    wget -O /tmp/packer.zip "${PACKER_URL}"
+    unzip -oud "${CIRCLECI_CACHE_DIR}" /tmp/packer.zip
+fi
 
-    if [ ! -f "${CIRCLECI_CACHE_DIR}/terraform" ] || [[ ! "$(terraform version)" =~ "Terraform v${PACKER_VERSION}" ]]; then
-        wget -O /tmp/terraform.zip "${TERRAFORM_URL}"
-        unzip -oud "${CIRCLECI_CACHE_DIR}" /tmp/terraform.zip
-    fi
+if [ ! -f "${CIRCLECI_CACHE_DIR}/terraform" ] || [[ ! "$(terraform version)" =~ "Terraform v${PACKER_VERSION}" ]]; then
+    wget -O /tmp/terraform.zip "${TERRAFORM_URL}"
+    unzip -oud "${CIRCLECI_CACHE_DIR}" /tmp/terraform.zip
+fi
 
-    packer version
-    terraform version
+packer version
+terraform version
+```
 
 Just to quickly summarize what the `dependencies.sh` script actually does:
 
@@ -263,67 +272,70 @@ After we have installed all the dependencies required, it is finally time for us
 
 To achieve this, we add the following step to our `steps` list:
 
-    ::yaml
-    steps:
-        ...
-        - deploy:
-                name: Building, Tagging and Pushing Docker Images
-                command: |
-                    if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                        ansible-playbook resources/packer/ansible/build.yaml
-                    fi
+```yaml
+steps:
+    ...
+    - deploy:
+            name: Building, Tagging and Pushing Docker Images
+            command: |
+                if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                    ansible-playbook resources/packer/ansible/build.yaml
+                fi
+```
 
 All it does is that it runs our `build.yaml` playbook if we are on the master branch. Note that we use `deploy` instead of `run` to make it explicit that its part of the deployment.
 
 The playbook itself looks like this:
 
-    ::yaml
-    - name: Build, Tag and Push Docker Image from Local folder.
-        hosts: 127.0.0.1
-        connection: local
-        roles:
-            - app-build
+```yaml
+- name: Build, Tag and Push Docker Image from Local folder.
+    hosts: 127.0.0.1
+    connection: local
+    roles:
+        - app-build
+```
 
 As you can see from the playbook, the `hosts` and `connection` keys make sure that the playbook is executed locally. It is not reaching out to any remote instance.
 
 The `app-build` role look like this:
 
-    ::yaml
-    {% raw %}
-    - name: Login to Docker
-       docker_login:
-            username: "{{ lookup('env','DOCKER_USERNAME') }}"
-            password: "{{ lookup('env','DOCKER_PASSWORD') }}"
-    {% endraw %}
-    - name: Build Docker Image
-       docker_image:
-            build:
-                args:
-                    ENV: prod
-                path: ./../../../src
-                pull: yes
-            name: myuser/myapp
-            source: build
-            state: present
-            tag: latest
+```yaml
+{% raw %}
+- name: Login to Docker
+    docker_login:
+        username: "{{ lookup('env','DOCKER_USERNAME') }}"
+        password: "{{ lookup('env','DOCKER_PASSWORD') }}"
+{% endraw %}
+- name: Build Docker Image
+    docker_image:
+        build:
+            args:
+                ENV: prod
+            path: ./../../../src
+            pull: yes
+        name: myuser/myapp
+        source: build
+        state: present
+        tag: latest
 
-    - name: Generate git commit hash
-       command: git log -n 1 --format="%h"
-       register: commit_hash
+- name: Generate git commit hash
+    command: git log -n 1 --format="%h"
+    register: commit_hash
 
-    - name: Tag and push image with commit hash
-       docker_image:
-            name: myuser/myapp:latest
-            repository: "myuser/myapp:{{ commit_hash.stdout }}"
-            push: yes
-            source: local
+- name: Tag and push image with commit hash
+    docker_image:
+        name: myuser/myapp:latest
+        repository: "myuser/myapp:{{ commit_hash.stdout }}"
+        push: yes
+        source: local
 
-    - name: Push image with latest tag
-       docker_image:
-            name: myuser/myapp
-            tag: latest
-            push: yes
-            source: local
+- name: Push image with latest tag
+    docker_image:
+        name: myuser/myapp
+        tag: latest
+        push: yes
+        source: local
+```
 
 Let's walk through the full ansible role together:
 
@@ -344,16 +356,16 @@ In theory, you could manually `tint` nodes to force them to be rebuilt and to pu
 
 This is done using the following step added to our `steps` list:
 
-    ::yaml
-    - deploy:
-            name: Building Packer Image
-            working_directory: ~/workspace/resources/packer
-            command: |
-                if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                    packer build -machine-readable web.json | tee web.log
-                    echo "export PACKER_IMAGE_ID=$(grep 'artifact,0,id' web.log | cut -d: -f2)" >> $BASH_ENV
-                fi
-
+```yaml
+- deploy:
+    name: Building Packer Image
+    working_directory: ~/workspace/resources/packer
+    command: |
+        if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            packer build -machine-readable web.json | tee web.log
+            echo "export PACKER_IMAGE_ID=$(grep 'artifact,0,id' web.log | cut -d: -f2)" >> $BASH_ENV
+        fi
+```
 Here we have some quite interesting things going on that took quite a while to figure out:
 
 - We change the `working_directory` to our packer folder to make sure that the commands get executed in the correct context.
@@ -370,30 +382,31 @@ Luckily, by using Terraform with our prebuild Packer image, it will be very easy
 
 The two last steps simply apply `terraform init`, `terraform plan` and `terraform apply` which means that it informs DigitalOcean to update any infrastructure that does not match the Infrastructure as Code definitions. 
 
-    ::yaml
-    steps:
-        ... 
-        - deploy:
-                name: Terraform Init and Plan
-                working_directory: ~/workspace/resources/terraform
-                command: |    
-                    if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                        terraform init -force-copy -input=false
-                        terraform plan \
-                            -var "web_image_id=${PACKER_IMAGE_ID}" \
-                            -var "pvt_key=${HOME}/.ssh/id_rsa_97728274n22912fa3fhdfk14a2636cec"
-                    fi
+```yaml
+steps:
+    ... 
+    - deploy:
+            name: Terraform Init and Plan
+            working_directory: ~/workspace/resources/terraform
+            command: |    
+                if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                    terraform init -force-copy -input=false
+                    terraform plan \
+                        -var "web_image_id=${PACKER_IMAGE_ID}" \
+                        -var "pvt_key=${HOME}/.ssh/id_rsa_97728274n22912fa3fhdfk14a2636cec"
+                fi
 
-        - deploy:
-                name: Terraform Apply
-                working_directory: ~/workspace/resources/terraform
-                command: |    
-                    if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                        terraform apply \
-                            -auto-approve \
-                            -var "web_image_id=${PACKER_IMAGE_ID}" \
-                            -var "pvt_key=${HOME}/.ssh/id_rsa_97728274n22912fa3fhdfk14a2636cec"
-                    fi
+    - deploy:
+            name: Terraform Apply
+            working_directory: ~/workspace/resources/terraform
+            command: |    
+                if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                    terraform apply \
+                        -auto-approve \
+                        -var "web_image_id=${PACKER_IMAGE_ID}" \
+                        -var "pvt_key=${HOME}/.ssh/id_rsa_97728274n22912fa3fhdfk14a2636cec"
+                fi
+```
 
 Note the following things about these steps:
 

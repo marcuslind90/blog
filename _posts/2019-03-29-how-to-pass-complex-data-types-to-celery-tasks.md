@@ -14,21 +14,23 @@ Isn't that weird?
 
 Imagine the following code:
 
-	::python
-	import yaml
-	
-	@app.task
-	def foo(options: Dict[str, Any]) -> str:
-		return yaml.dump(options)
+```python
+import yaml
 
-	foo.delay(options=yaml.load("from: 2019-01-01")
+@app.task
+def foo(options: Dict[str, Any]) -> str:
+    return yaml.dump(options)
+
+foo.delay(options=yaml.load("from: 2019-01-01")
+```
 
 What do you expect the final YAML to be in the code above? Shouldn't it just be the original yaml string? Isn't it same as doing the following?
 
-	::python
-	import yaml
+```python
+import yaml
 
-	yaml.dump(yaml.load("from: 2019-01-01"))
+yaml.dump(yaml.load("from: 2019-01-01"))
+```
 
 The answer is: No! It is not the same thing. The differences between these two methods are because of all the things that Celery abstract away from us.
 
@@ -39,8 +41,9 @@ The messages are stored as text, so even if we're passing data types such as int
 
 So what this means is that when we're doing something like:
 
-	::python
-	foo.delay(options=dict(from=datetime.date(2019, 1, 1)))
+```python
+foo.delay(options=dict(from=datetime.date(2019, 1, 1)))
+```
 
 What we're actually doing is the following:
 
@@ -87,9 +90,10 @@ The `task_serializer` setting is used by the client to determine how it should s
 
 On top of that, you can also specify the serializer on a task-call level instead of setting it for the whole system. For example, you might use `json` by default but in a few other cases use `yaml` or `pickle` to serialize your data.
 
-	::python
-	# Override default serializer and use yaml instead.
-	foo_task.apply_async(kwargs=data, serializer="yaml")
+```python
+# Override default serializer and use yaml instead.
+foo_task.apply_async(kwargs=data, serializer="yaml")
+```
 
 ### Which Serializer Should I Use?
 Celery comes with [4 different serializers](http://docs.celeryproject.org/en/latest/userguide/calling.html#serializers) out of the box.

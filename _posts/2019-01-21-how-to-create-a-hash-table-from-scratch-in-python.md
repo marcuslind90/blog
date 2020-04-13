@@ -23,9 +23,10 @@ This basically means that it all comes down to storing values in a list/array. B
 
 For example:
 
-	::python
-	values = [("foo", 1), ("bar", 2), ]
-	
+```python
+values = [("foo", 1), ("bar", 2), ]
+```
+
 Lists doesn't use keys, it uses indexes. You can only access a value in a list by the index or position that it's stored at. E.g. `values[1]` would be `("bar", 2)` in the example above.
 
 So what if we instead wanted to be sure that we could access each key value pair by its key. Another way to look at it would be to ask ourselves "How can we figure out which index we should store a value in by a string key?. Think about that for a moment.
@@ -36,14 +37,15 @@ The important part is that this code is repeatable and that we get the same posi
 
 An example implementation of this would be:
 
-	::python
-	ARR_LENGTH = 4
-	# Initiate array
-	values = [None] * ARR_LENGTH
-	
-	def get_index(key: str):
-		return hash(key) % len(values)
-		
+```python
+ARR_LENGTH = 4
+# Initiate array
+values = [None] * ARR_LENGTH
+
+def get_index(key: str):
+    return hash(key) % len(values)
+```
+
 This would always return an index that exist within our `values` list. Note that the python `hash` function returns an integer.
 
 By knowing this, we can now start implementing our Hash Table class.
@@ -56,67 +58,69 @@ For example, if you have a list of length 2, chances that 2 strings will want to
 
 Eg:
 
-	::python
-		self.array [
-			[("foo", 1), ("bar", 2), ], 
-			[("hello", 3), ("world", 4), ], 
-		]
+```python
+    self.array [
+        [("foo", 1), ("bar", 2), ], 
+        [("hello", 3), ("world", 4), ], 
+    ]
+```
 
 Great, let's get going then with the first part of our implementation. I will start by implementing `__init__()`, `hash()`, `add()` and `get()`. 
 
-	::python
-	class HashTable(object):
-		def __init__(self, length=4):
-			# Initiate our array with empty values.
-			self.array = [None] * length
-		
-		def hash(self, key):
-			"""Get the index of our array for a specific string key"""
-			length = len(self.array)
-			return hash(key) % length
-			
-		def add(self, key, value):
-			"""Add a value to our array by its key"""
-			index = self.hash(key)
-			if self.array[index] is not None:
-				# This index already contain some values.
-				# This means that this add MIGHT be an update
-				# to a key that already exist. Instead of just storing
-				# the value we have to first look if the key exist.
-				for kvp in self.array[index]:
-					# If key is found, then update
-					# its current value to the new value.
-					if kvp[0] == key:
-						kvp[1] = value
-						break
-				else:
-					# If no breaks was hit in the for loop, it 
-					# means that no existing key was found, 
-					# so we can simply just add it to the end.
-					self.array[index].append([key, value])
-			else:
-				# This index is empty. We should initiate 
-				# a list and append our key-value-pair to it.
-				self.array[index] = []
-				self.array[index].append([key, value])
-		
-		def get(self, key):
-			"""Get a value by key"""
-			index = self.hash(key)
-			if self.array[index] is None:
-				raise KeyError()
-			else:
-				# Loop through all key-value-pairs
-				# and find if our key exist. If it does 
-				# then return its value.
-				for kvp in self.array[index]:
-					if kvp[0] == key:
-						return kvp[1]
-				
-				# If no return was done during loop,
-				# it means key didn't exist.
-				raise KeyError()
-				
+```python
+class HashTable(object):
+    def __init__(self, length=4):
+        # Initiate our array with empty values.
+        self.array = [None] * length
+    
+    def hash(self, key):
+        """Get the index of our array for a specific string key"""
+        length = len(self.array)
+        return hash(key) % length
+        
+    def add(self, key, value):
+        """Add a value to our array by its key"""
+        index = self.hash(key)
+        if self.array[index] is not None:
+            # This index already contain some values.
+            # This means that this add MIGHT be an update
+            # to a key that already exist. Instead of just storing
+            # the value we have to first look if the key exist.
+            for kvp in self.array[index]:
+                # If key is found, then update
+                # its current value to the new value.
+                if kvp[0] == key:
+                    kvp[1] = value
+                    break
+            else:
+                # If no breaks was hit in the for loop, it 
+                # means that no existing key was found, 
+                # so we can simply just add it to the end.
+                self.array[index].append([key, value])
+        else:
+            # This index is empty. We should initiate 
+            # a list and append our key-value-pair to it.
+            self.array[index] = []
+            self.array[index].append([key, value])
+    
+    def get(self, key):
+        """Get a value by key"""
+        index = self.hash(key)
+        if self.array[index] is None:
+            raise KeyError()
+        else:
+            # Loop through all key-value-pairs
+            # and find if our key exist. If it does 
+            # then return its value.
+            for kvp in self.array[index]:
+                if kvp[0] == key:
+                    return kvp[1]
+            
+            # If no return was done during loop,
+            # it means key didn't exist.
+            raise KeyError()
+```
+
 This should be pretty straight forward and self explanatory with the comments added, but just to summarize quickly what we are doing:
 
 - In `__init__` we initiate our list with a fixed length of 4. Each index contain a `None` value which represents that no values exist in that index yet.
@@ -143,42 +147,43 @@ The solution to this is that we make the size of our list flexible. We allow it 
 
 Lets implement the `is_full()` and `double()` methods to our `HashTable` class.
 
-	::python
-	class HashTable(object):
-		
-		...
-		
-		def is_full(self):
-			"""Determines if the HashTable is too populated."""
-			items = 0
-			# Count how many indexes in our array
-			# that is populated with values.
-			for item in self.array:
-				if item is not None:
-					items += 1
-			# Return bool value based on if the 
-			# amount of populated items are more 
-			# than half the length of the list.
-			return items > len(self.array)/2
-			
-		def double(self):
-			"""Double the list length and re-add values"""
-			ht2 = HashTable(length=len(self.array)*2)
-			for i in range(len(self.array)):
-				if self.array[i] is None:
-					continue
-				
-				# Since our list is now a different length,
-				# we need to re-add all of our values to 
-				# the new list for its hash to return correct
-				# index.
-				for kvp in self.array[i]:
-					ht2.add(kvp[0], kvp[1])
-			
-			# Finally we just replace our current list with 
-			# the new list of values that we created in ht2.
-			self.array = ht2.array
-			
+```python
+class HashTable(object):
+    
+    ...
+    
+    def is_full(self):
+        """Determines if the HashTable is too populated."""
+        items = 0
+        # Count how many indexes in our array
+        # that is populated with values.
+        for item in self.array:
+            if item is not None:
+                items += 1
+        # Return bool value based on if the 
+        # amount of populated items are more 
+        # than half the length of the list.
+        return items > len(self.array)/2
+        
+    def double(self):
+        """Double the list length and re-add values"""
+        ht2 = HashTable(length=len(self.array)*2)
+        for i in range(len(self.array)):
+            if self.array[i] is None:
+                continue
+            
+            # Since our list is now a different length,
+            # we need to re-add all of our values to 
+            # the new list for its hash to return correct
+            # index.
+            for kvp in self.array[i]:
+                ht2.add(kvp[0], kvp[1])
+        
+        # Finally we just replace our current list with 
+        # the new list of values that we created in ht2.
+        self.array = ht2.array
+```
+
 What did we just do?
 
 - `is_full()` determines if we have the need to double/increase the size of our list or not. In our case we determine that our list is full whenever its more than 50% populated, but you could change this threshold to a lower or higher value if you wanted to.
@@ -188,15 +193,16 @@ Obviously it takes some time to double our list, but it happens relatively rarel
 
 Finally we can start using our methods within our `add()` method by extending it with the following:
 
-	::python
-	class HashTable(object):
-		...
-		
-		def add(self, key, value):
-			...
-			if self.is_full():
-				self.double()
-				
+```python
+class HashTable(object):
+    ...
+    
+    def add(self, key, value):
+        ...
+        if self.is_full():
+            self.double()
+```
+
 That means that whenever we have added an item that made our list hit the limit of what it consider to be "full", it will automatically double the size of itself. We are now done with the core implementation of our HashTable.
 
 ## Add Additional Methods
@@ -204,31 +210,33 @@ By now you should have a good enough understanding of our Hash Table to be able 
 
 By doing this you could do things such as:
 
-	::python
-	ht = HashTable()
-	# Using __setitem__
-	ht["foo"] = "bar"
-	
-	# using __getitem__
-	val = ht["foo"]
-	
-	# using __contains__
-	if "foo" in ht:
-		print("Exist!")
-		
-	# using __iter__
-	for kvp in ht:
-		print(kvp)
-		
+```python
+ht = HashTable()
+# Using __setitem__
+ht["foo"] = "bar"
+
+# using __getitem__
+val = ht["foo"]
+
+# using __contains__
+if "foo" in ht:
+    print("Exist!")
+    
+# using __iter__
+for kvp in ht:
+    print(kvp)
+```
+
 In the case of our `HashTable` class we could implement `__setitem__` and `__getitem__` with our existing `get()` and `add()` methods.
 
-	::python
-	class HashTable(object):
-		...
-		def __setitem__(self, key, value):
-			self.add(key, value)
-		
-		def __getitem__(self, key):
-			return self.get(key)
-			
+```python
+class HashTable(object):
+    ...
+    def __setitem__(self, key, value):
+        self.add(key, value)
+    
+    def __getitem__(self, key):
+        return self.get(key)
+```
+
 Maybe you could implement the other recommended magic methods on your own as an exercise to prove to yourself that you truly understand how Hash Tables are implemented.

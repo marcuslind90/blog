@@ -27,34 +27,36 @@ A second, very significant advantage of doing this is that you will be able to h
 
 So instead of writing out these things in clear text you use the `os` library to read in environment variables to your code. 
 
-	::python
-	import os
-	
-	
-	DEBUG = os.environ.get('DEBUG', False)
-	SECRET_KEY = os.environ.get('SECRET_KEY')
-	DATABASES = {
-		'default': {
-			'ENGINE': 'django.db.backends.postgresql',
-			'NAME': os.environ.get('RDS_DB_NAME'),
-			'USER': os.environ.get('RDS_USERNAME'),
-			'PASSWORD': os.environ.get('RDS_PASSWORD'),
-			'HOST': os.environ.get('RDS_HOST'),
-			'PORT': os.environ.get('RDS_PORT'),
-		}
-	}
-	
+```python
+import os
+
+
+DEBUG = os.environ.get('DEBUG', False)
+SECRET_KEY = os.environ.get('SECRET_KEY')
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('RDS_DB_NAME'),
+        'USER': os.environ.get('RDS_USERNAME'),
+        'PASSWORD': os.environ.get('RDS_PASSWORD'),
+        'HOST': os.environ.get('RDS_HOST'),
+        'PORT': os.environ.get('RDS_PORT'),
+    }
+}
+```
+
 So the question is, how can you easily define all of these environment variables? Especially when you're running your application on your local machine, you might require different environment variables for each project and you don't want to set it all on your operating system level.
 
 ### Reading in Environment Variables with Docker
 If you're using Docker with Docker-Compose you can simply define an `env_file` setting that point to a `.env` file that you add to your `.gitignore` file to make sure that it never gets checked into your repository. This file will simply contain the environment variables for your environment in the following format:
 
-	::bash
-	DB_HOST=localhost
-	DB_PORT=5432
-	DB_USER=postgres
-	DB_PASSWORD=helloworld
-	
+```bash
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=helloworld
+```
+
 Docker will then read in this file and define the variables within the container every time you run it. Great isn't it?
 
 ### Reading in Environment Variables with python-dotenv
@@ -103,35 +105,36 @@ Django will make it easy for you to [configure logging](https://docs.djangoproje
 A suggested configuration is to log all messages to a file, and then alert the administrators of the website by email if there is any serious errors happening on the website. You could achieve that type of configuration with the following settings:
 
 
-	::python
-	ADMINS = [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
-	LOGGING = {
-		'version': 1,
-		'disable_existing_loggers': False,
-		'formatters': {
-			'simple': {
-				'format': '{levelname} {message}',
-				'style': '{',
-			},
-		},
-		'handlers': {
-			'file': {
-				'level': 'INFO',
-				'class': 'logging.FileHandler',
-				'filename': '/path/to/django/debug.log',
-			},
-			'mail_admins': {
-				'level': 'ERROR',
-				'class': 'django.utils.log.AdminEmailHandler',
-			}
-		},
-		'loggers': {
-			'django': {
-				'handlers': ['file', 'mail_admins'],
-				'propagate': True,
-			},
-		}
-	}
+```python
+ADMINS = [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': '/path/to/django/debug.log',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'mail_admins'],
+            'propagate': True,
+        },
+    }
+}
+```
 
 With that type of configuration you will be alerted immediately when an `ERROR` level log message occurred, and for any other issue it will allow you to simply go back to the log file and investigate further.
 

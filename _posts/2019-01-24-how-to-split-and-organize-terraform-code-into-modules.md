@@ -24,25 +24,27 @@ So after I've done the same mistake myself, and dumped all of my definitions int
 ### Suggested File Hierarchy
 For the web project I was working on, I transitioned from the following file structure:
 
-	::bash
-	./terraform
-		main.tf
-		
+```bash
+./terraform
+    main.tf
+```
+
 To my improved file structure:
 
-	::bash
-	./terraform
-		./web
-			droplet.tf
-			firewall.tf
-			loadbalancer.tf
-			main.tf
-		./db
-			droplet.tf
-			firewall.tf
-			main.tf
-		main.tf
-		
+```bash
+./terraform
+    ./web
+        droplet.tf
+        firewall.tf
+        loadbalancer.tf
+        main.tf
+    ./db
+        droplet.tf
+        firewall.tf
+        main.tf
+    main.tf
+```
+
 Just by giving the file hierarchy itself a good look we went from having no idea what the `main.tf` file contained, to suddenly having a great insight into what parts our infrastructure consists of just by looking at the folder and file names.
 
 Hopefully, this illustrates the usefulness of splitting your Terraform code into modules, but this also comes with some new requirements. Instead of expecting any kind of variable to be available anywhere, we now have to make sure that state and variables are passed in, or exported to and from each module that needs the information.
@@ -50,27 +52,28 @@ Hopefully, this illustrates the usefulness of splitting your Terraform code into
 ### Defining the Modules And Passing Variables
 So let's start off with our root `./terraform/main.tf` file. This file by itself will not contain any resources, instead, it will just import and define all of the input variables and the modules that we want to use. 
 
-	::terraform
-	variable "do_token" {}
-	variable "pvt_key" {}
-	variable "ssh_fingerprint" {}
-	
-	provider "digitalocean" {
-		token = "${var.do_token}"
-	}
-	
-	module "web" {
-		source = "./web"
-		pvt_key = "${var.pvt_key}"
-		ssh_fingerprint = "${var.ssh_fingerprint}"
-	}
-	
-	module "db" {
-		source = "./db"
-		pvt_key = "${var.pvt_key}"
-		ssh_fingerprint = "${var.ssh_fingerprint}"
-	}
-	
+```terraform
+variable "do_token" {}
+variable "pvt_key" {}
+variable "ssh_fingerprint" {}
+
+provider "digitalocean" {
+    token = "${var.do_token}"
+}
+
+module "web" {
+    source = "./web"
+    pvt_key = "${var.pvt_key}"
+    ssh_fingerprint = "${var.ssh_fingerprint}"
+}
+
+module "db" {
+    source = "./db"
+    pvt_key = "${var.pvt_key}"
+    ssh_fingerprint = "${var.ssh_fingerprint}"
+}
+```
+
 So lets talk about what we are doing here. Obviously, this is just an example and for our example, we use the `"digitalocean"` provider to provision resources in the cloud at DigitalOcean.
 
 - We start off by defining 3x `variable` that we expect to be provided when calling our Terraform `terraform plan` and `terraform apply` commands. These variables are required by our DigitalOcean provider to be able to provision resources.
@@ -82,10 +85,11 @@ In the previous section, we could see how our root `main.tf` file define modules
 
 So let's take the `web` module as an example. In `./terraform/web/main.tf` we have to add the following definitions:
 
-	::terraform	
-	variable "pvt_key" {}
-	variable "ssh_fingerprint" {}
-	
+```terraform	
+variable "pvt_key" {}
+variable "ssh_fingerprint" {}
+```
+
 By doing that it means that we can now access the values passed in as `"${var.pvt_key}"` or `"${var.ssh_fingerprint}"` from anywhere within our `web` module.
 
 ## Accessing Values from Other Terraform Modules
@@ -108,21 +112,23 @@ As you can see from the code, what it does is that it exports the `db_ip` variab
 
 If we then go back to our `./terraform/main.tf` file we can now access this exported variable as `"${module.db.db_ip}"`. So we can then pass it into our `web` module by adding another line of variable definitions to it:
 	
-	::terraform
-	module "web" {
-		source = "./web"
-		pvt_key = "${var.pvt_key}"
-		ssh_fingerprint = "${var.ssh_fingerprint}"
-		db_ip = "${module.db.db_ip}"
-	}
-	
+```terraform
+module "web" {
+    source = "./web"
+    pvt_key = "${var.pvt_key}"
+    ssh_fingerprint = "${var.ssh_fingerprint}"
+    db_ip = "${module.db.db_ip}"
+}
+```
+
 Then obviously inside our `./terraform/web/main.tf` file we also have to add the `variable` definition of `db_ip` so that the module itself knows that it should expect it as an input.
 
-	::terraform
-	variable "pvt_key" {}
-	variable "ssh_fingerprint" {}
-	variable "db_ip" {}
-	
+```terraform
+variable "pvt_key" {}
+variable "ssh_fingerprint" {}
+variable "db_ip" {}
+```
+
 We can now access the value as `"${var.db_ip}"` from anywhere within our `web` container.
 
 ## The Magic of Terraform Inferred Dependencies

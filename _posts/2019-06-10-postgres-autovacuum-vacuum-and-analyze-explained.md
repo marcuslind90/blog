@@ -52,8 +52,9 @@ The data is then supposed to be garbage collected by something called vacuum.
 ### Check Dead Tuples in PostgreSQL
 I was able to confirm that dead rows (called Tuples in Postgres) were the reason for all the additional disk space by running the following query in Postgres:
 
-	::sql
-	SELECT schemaname, relname, n_live_tup, n_dead_tup, last_autoanalyze, last_autovacuum FROM pg_stat_all_tables ORDER BY last_autovacuum DESC NULLS LAST;
+```sql
+SELECT schemaname, relname, n_live_tup, n_dead_tup, last_autoanalyze, last_autovacuum FROM pg_stat_all_tables ORDER BY last_autovacuum DESC NULLS LAST;
+```
 
 That will list all of your tables in your database ordered by when they were cleaned up by `autovacuum`. The `n_live_tup` is the remaining rows in your table while `n_dead_tup` is the number of rows that have been marked for deletion.
 

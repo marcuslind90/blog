@@ -39,50 +39,54 @@ The system dependencies required for Ubuntu/Debian are the following:
 
 In my own case I install it in my `Dockerfile` using the following command:
 
-	::Docker
-	RUN apt-get update
-	RUN DEBIAN_FRONTEND=noninteractive apt-get install -y  libldap2-dev libsasl2-dev slapd ldap-utils
+```dockerfile
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y  libldap2-dev libsasl2-dev slapd ldap-utils
+```
 
 After you've installed the required system dependencies you can then install the django package using:
 
-	::bash
-	# Note that a more recent version might be out when you're 
-	# reading this article.
-	pip install django-auth-ldap==1.7.0
+```bash
+# Note that a more recent version might be out when you're 
+# reading this article.
+pip install django-auth-ldap==1.7.0
+```
 
 ## Configure Django Auth LDAP
 After we've installed the package and its dependencies we are ready to configure it to work the way we want to, and to integrate with our specific Active Directory instance. Unlike many other Django packages, `django-auth-ldap` **do not** need you to add it to your application's `INSTALLED_APPS` setting.
 
 The first thing we need to do is to add the LDAP Backend to our `AUTHENTICATION_BACKENDS` setting. Note that this custom backend does not extend the traditional `ModelBackend` so if you still want to support traditional Django users and authentication, you should leave this one in.
 
-	::python
-	AUTHENTICATION_BACKENDS = [
-		"django.contrib.auth.backends.ModelBackend",
-		"django_auth_ldap.backend.LDAPBackend",
-	]
-	
+```python
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "django_auth_ldap.backend.LDAPBackend",
+]
+```
+
 Note that the order of the backends matter. By specifying the `ModelBackend` first in the list, it means that authentication requests will first attempt to authenticate towards our database, and after that try to authenticate using LDAP towards our Active Directory instance.
 
 The next step is to configure the package specific settings that defines how we query Active Directory to find the user data.
 
-	::python
-	import ldap
-	from django_auth_ldap.config import LDAPSearch
-	
-	AUTH_LDAP_SERVER_URI = os.environ.get("LDAP_HOST")
-	AUTH_LDAP_ALWAYS_UPDATE_USER = True
-	AUTH_LDAP_BIND_DN = os.environ.get("LDAP_USERNAME")
-	AUTH_LDAP_BIND_PASSWORD = os.environ.get("LDAP_PASSWORD")
-	AUTH_LDAP_USER_SEARCH = LDAPSearch(
-		"ou=mybiz,dc=mybiz,dc=com", ldap.SCORE.SUBTREE, "sAMAccountName=%(user)s"
-	)
-	AUTH_LDAP_USER_ATTR_MAP = {
-		"username": "sAMAccountName",
-		"first_name": "givenName",
-		"last_name": "sn",
-		"email": "mail",
-	}
-	
+```python
+import ldap
+from django_auth_ldap.config import LDAPSearch
+
+AUTH_LDAP_SERVER_URI = os.environ.get("LDAP_HOST")
+AUTH_LDAP_ALWAYS_UPDATE_USER = True
+AUTH_LDAP_BIND_DN = os.environ.get("LDAP_USERNAME")
+AUTH_LDAP_BIND_PASSWORD = os.environ.get("LDAP_PASSWORD")
+AUTH_LDAP_USER_SEARCH = LDAPSearch(
+    "ou=mybiz,dc=mybiz,dc=com", ldap.SCORE.SUBTREE, "sAMAccountName=%(user)s"
+)
+AUTH_LDAP_USER_ATTR_MAP = {
+    "username": "sAMAccountName",
+    "first_name": "givenName",
+    "last_name": "sn",
+    "email": "mail",
+}
+```
+
 Lets go through all of this together shall we?
 
 - `AUTH_LDAP_SERVER_URI` is the host that we will send our LDAP requests to, this is the Active Directory host that contain all of our data. For example the value could be `ldap://ldap.coderbook.com`. Note that we use the `ldap://` protocol.
@@ -111,20 +115,21 @@ This is quite simple to achieve with the existing `django-auth-ldap` configurati
 
 In the example below we will map the LDAP Group of the authenticated user to automatically set the `is_superuser` parameter which will give the user full access to our application. All of these values should be added to our `settings.py` file together with the configuration example from our section above.
 
-	::python
-	from django_auth_ldap.config import ActiveDirectoryGroupType
-	
+```python
+from django_auth_ldap.config import ActiveDirectoryGroupType
 
-	AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
-		"ou=mybiz,dc=mybiz,dc=com", ldap.SCOPE_SUBTREE, "(objectCategory=Group)"
-	)
-	AUTH_LDAP_GROUP_TYPE = ActiveDirectoryGroupType(name_attr="cn")
-	AUTH_LDAP_USER_FLAGS_BY_GROUP = {
-		"is_superuser": "cn=Management,ou=Super Users Groups,ou=mybiz,dc=mybiz,dc=com",
-	}
-	AUTH_LDAP_FIND_GROUP_PERMS = True
-	AUTH_LDAP_CACHE_GROUPS = True
-	AUTH_LDAP_GROUP_CACHE_TIMEOUT = 1  # 1 hour cache
+
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
+    "ou=mybiz,dc=mybiz,dc=com", ldap.SCOPE_SUBTREE, "(objectCategory=Group)"
+)
+AUTH_LDAP_GROUP_TYPE = ActiveDirectoryGroupType(name_attr="cn")
+AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+    "is_superuser": "cn=Management,ou=Super Users Groups,ou=mybiz,dc=mybiz,dc=com",
+}
+AUTH_LDAP_FIND_GROUP_PERMS = True
+AUTH_LDAP_CACHE_GROUPS = True
+AUTH_LDAP_GROUP_CACHE_TIMEOUT = 1  # 1 hour cache
+```
 
 Let's summarize these settings:
 
@@ -145,44 +150,45 @@ By creating a `signals.py` file within your application that include the followi
 
 In our example, imagine that users belong to groups such as `Staff Sweden`, `Staff Thailand`, `Staff USA`. Maybe you want all of them to be part of the `Staff` Group, but you also want each of them to belong to a specific market that you have added to your custom Django User model.
 
-	::python
-	import re
-	from django.dispatch import receiver
-	from django_auth_ldap.backend import populate_user, LDAPBackend
-	
-	
-	@receiver(populate_user, sender=LDAPBackend)
-	def ldap_auth_handler(user, ldap_user, **kwargs):
-		"""
-		Django Signal handler that assign user to Group and Market.
-		
-		This signal gets called after Django Auth LDAP Package have populated
-		the user with its data, but before the user is saved to the database.
-		"""
-		# Check all of the user's group names to see if they belong
-		# in a group that match what we're looking for.
-		for group_name in ldap_user.group_names:
-			 match = re.match(r"^Staff ([\w\d\s-]+)$", group_name)
-			if match is None:
-				continue
-			
-			# Store the market name, e.g. "USA"
-			market_name = match.group(1).strip()
-			group_name = "Staff"
-			
-			# Since this signal is called BEFORE the user object is saved to the database,
-			# we have to save it first so that we then can assign groups to it.
-			user.save()
-			
-			# Add user to the Staff Django group.
-			group = Group.objects.get(name=group_name)
-			user.grous.add(group)
-			
-			try:
-				market = Market.objects.get(name=market_name)
-				user.markets.add(market)
-			except ObjectDoesNotExist:
-				logger.error(f"Attempted to add user to market {market_name} that doesnt exist")
+```python
+import re
+from django.dispatch import receiver
+from django_auth_ldap.backend import populate_user, LDAPBackend
+
+
+@receiver(populate_user, sender=LDAPBackend)
+def ldap_auth_handler(user, ldap_user, **kwargs):
+    """
+    Django Signal handler that assign user to Group and Market.
+    
+    This signal gets called after Django Auth LDAP Package have populated
+    the user with its data, but before the user is saved to the database.
+    """
+    # Check all of the user's group names to see if they belong
+    # in a group that match what we're looking for.
+    for group_name in ldap_user.group_names:
+            match = re.match(r"^Staff ([\w\d\s-]+)$", group_name)
+        if match is None:
+            continue
+        
+        # Store the market name, e.g. "USA"
+        market_name = match.group(1).strip()
+        group_name = "Staff"
+        
+        # Since this signal is called BEFORE the user object is saved to the database,
+        # we have to save it first so that we then can assign groups to it.
+        user.save()
+        
+        # Add user to the Staff Django group.
+        group = Group.objects.get(name=group_name)
+        user.grous.add(group)
+        
+        try:
+            market = Market.objects.get(name=market_name)
+            user.markets.add(market)
+        except ObjectDoesNotExist:
+            logger.error(f"Attempted to add user to market {market_name} that doesnt exist")
+```
 
 Voila, there we have a complete example of how we can access the LDAP data within our Django Signal and then do some kind of custom action to it. In this case as you can see, we try to find out if the user belong to a "Staff" group and then add them to the group but also map them to the correct Market.
 

@@ -25,22 +25,24 @@ This becomes a tradeoff between faster build times and larger storage space. The
 ### Optimizing Order of Commands in Dockerfile
 Imagine that we had the following Dockerfile:
 
-    ::docker
-    FROM python:3.7 # Step 1/4
-    WORKDIR /app # Step 2/4
-    COPY ./src /app # Step 3/4
-    RUN pip install -Ur requirements.txt # Step 4/4
+```dockerfile
+FROM python:3.7 # Step 1/4
+WORKDIR /app # Step 2/4
+COPY ./src /app # Step 3/4
+RUN pip install -Ur requirements.txt # Step 4/4
+```
 
 This would simply copy our source into our container and install the dependencies. But what happens if our source change and we rebuild our application? The build would have to start from Step 3/4, which means that it would have to reinstall all of our dependencies using `pip` even though they never changed. 
 
 This would greatly slow down our build time. The solution to this would be to separate the `requirements.txt` file from the rest when we copy them into the container.
 
-    ::docker
-    FROM python:3.7 # Step 1/4
-    WORKDIR /app # Step 2/4
-    COPY ./src/requirements.txt /app # Step 3/5
-    RUN pip install -Ur requirements.txt # Step 4/5
-    COPY ./src /app # Step 5/5
+```dockerfile
+FROM python:3.7 # Step 1/4
+WORKDIR /app # Step 2/4
+COPY ./src/requirements.txt /app # Step 3/5
+RUN pip install -Ur requirements.txt # Step 4/5
+COPY ./src /app # Step 5/5
+```
 
 This change would mean that as long as its not our `requirements.txt` file that is changed, we would only need to redo step 5 when we rebuild our image after the source has been modified. This would save us minutes in build time.
 
@@ -49,24 +51,26 @@ The second way that we can improve the cache layers is to simply reduce them. Th
 
 I stumbled unto a Dockerfile in an open-source package the other day that looked something like this:
 
-    ::docker
-    RUN apt-get update
-    RUN apt-get -y install git mercurial ca-certificates
-    RUN apt-get -y install postgresql postgresql-server-dev-9.3 redis-server
-    RUN apt-get -y install elasticsearch openjdk-7-jre
-    RUN apt-get -y install python2.7 python-pip python-dev
-    RUN apt-get -y install libxml2 libxml2-dev libxslt1-dev
-    RUN apt-get -y install npm
+```dockerfile
+RUN apt-get update
+RUN apt-get -y install git mercurial ca-certificates
+RUN apt-get -y install postgresql postgresql-server-dev-9.3 redis-server
+RUN apt-get -y install elasticsearch openjdk-7-jre
+RUN apt-get -y install python2.7 python-pip python-dev
+RUN apt-get -y install libxml2 libxml2-dev libxslt1-dev
+RUN apt-get -y install npm
+```
 
 Every single one of these commands adds additional Cache Layers to our image without adding much value, the frequency of us wanting to update the system dependencies are extremely low so caching them on this granularity is not very useful.
 
 We could reduce this to a single cache layer by using something that we call "Chaining". 
 
-    ::docker
-    RUN apt-get update && apt-get -y install git mercurial ca-certificates \
-        postgresql postgresql-server-dev-9.3 redis-server \ 
-        elasticsearch openjdk-7-jre python2.7 python-pip \
-        python-dev libxml2 libxml2-dev libxslt1-dev npm
+```dockerfile
+RUN apt-get update && apt-get -y install git mercurial ca-certificates \
+    postgresql postgresql-server-dev-9.3 redis-server \ 
+    elasticsearch openjdk-7-jre python2.7 python-pip \
+    python-dev libxml2 libxml2-dev libxslt1-dev npm
+```
 
 As you can see, we still install the same amount of dependencies, but instead of calling `RUN` for each and every one, we chain them into a single command that generates a single cache layer.
 
@@ -95,21 +99,22 @@ If we continue on the concept of "only store things required for you to run the 
 
 Image that we had the following Dockerfile.
 
-    ::docker
-    # Inherit from Linux Alpine with Python3.7 installed.
-    FROM python:3.7-alpine
+```dockerfile
+# Inherit from Linux Alpine with Python3.7 installed.
+FROM python:3.7-alpine
 
-    ENV PYTHONUNBUFFERED 1
-    WORKDIR /app
+ENV PYTHONUNBUFFERED 1
+WORKDIR /app
 
-    # Install System dependencies
-    RUN apk update && \
-        apk add --no-cache zlib-dev python-dev build-base
+# Install System dependencies
+RUN apk update && \
+    apk add --no-cache zlib-dev python-dev build-base
 
-    # Install Python dependencies
-    RUN pip install -Ur requirements.txt
-    # Copy Source
-    COPY ./app.py /app/
+# Install Python dependencies
+RUN pip install -Ur requirements.txt
+# Copy Source
+COPY ./app.py /app/
+```
 
 We install multiple dependencies using `apk add` that are required for us to be able to use `pip install -Ur requirements.txt` since some of the dependencies need to be built. After we have installed the pip dependencies, we no longer care about the system dependencies we installed earlier.
 
@@ -122,6 +127,7 @@ Remember that we have a `FROM` command that goes in the top of our Dockerfile? T
 
 We could rewrite our previous example into the following:
 
+```dockerfile
     # Inherit from Linux Alpine with Python3.7 installed.
     FROM python:3.7-alpine AS builder
 
@@ -147,6 +153,7 @@ We could rewrite our previous example into the following:
 
     # Copy local application into image.
     COPY ./app.py /app/
+```
 
 This is a 2 stage build as you can see separated by the `FROM` steps written in the Dockerfile.
 

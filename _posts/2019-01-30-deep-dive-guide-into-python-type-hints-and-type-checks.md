@@ -21,17 +21,19 @@ A lot of people love the flexibility that languages such as Javascript or Python
 
 For example, imagine the following method in Python:
 
-	::python
-	def calculate(a, b):
-		return a*b
+```python
+def calculate(a, b):
+    return a*b
+```
 
 What type of objects is `a` and `b`? Does it matter? Python doesn't care as long as both of them have the `__mul__`  magic method defined, which is the magic method that determines how class handle multiplication. They could be a `float` and an `int`, it could be a `str` and an `int`, it could be 2 `float` or 2 `int` or any other combination of types.
 
 The same thing goes for something like this:
 
-	::python
-	def save(file, content):
-		file.write(content)
+```python
+def save(file, content):
+    file.write(content)
+```
 
 What type is `file`? We don't care, as long as it has a `write()` method defined within it, it will work fine. It could be an `IO` object that writes to an actual file, it could just be a class that writes it to a database, or just adds it to memory. Python doesn't care.
 
@@ -48,33 +50,35 @@ Perhaps one of the most liked features about Python is how easy it is to read an
 
 With that in mind, let's look at another code example written in Python where once again, we don't define any Types in our function definition.
 
-	::python
-	from functools import reduce
+```python
+from functools import reduce
 
 
-	def get_total(items, rate):
-		return reduce(
-			lambda a, b: a+b,
-			[item.total*rate.value for item in items],
-			0
-		)
+def get_total(items, rate):
+    return reduce(
+        lambda a, b: a+b,
+        [item.total*rate.value for item in items],
+        0
+    )
+```
 
 What does this function actually do? Well, we know that it gets the total of something, but the total of what? If you were a programmer that worked on the project where this code is written, would you feel confident to reuse this function for your own purposes? Probably not.
 
 This is where Type Hints can be so incredibly useful. Let's rewrite our method using the Python's Type Hints to see if we can improve the readability.
 
-	::python
-	from functools import reduce
-	from typing import List
-	from .models import Product, Discount
-	
+```python
+from functools import reduce
+from typing import List
+from .models import Product, Discount
 
-	def get_total(items: List[Product], rate: Discount) -> int:
-		return reduce(
-			lambda a, b: a+b,
-			[item.total*rate.value for item in items],
-			0
-		)
+
+def get_total(items: List[Product], rate: Discount) -> int:
+    return reduce(
+        lambda a, b: a+b,
+        [item.total*rate.value for item in items],
+        0
+    )
+```
 
 The same amount of lines of code, but now suddenly things got much more clear. So our `items` are actually product items of the `Product` class, and the rate represents a discount rate of the `Discount` class. On top of this, we found out that we can always except the function to return an integer value.
 
@@ -91,9 +95,10 @@ Because Python doesn't care about types at runtime, it means that the type check
 
 For example, if we wanted to, we could simply just annotate the first argument of our function and leave all the other ones as they are. 
 
-	::python
-	def get_total(items: List[Product], rate):
-		...
+```python
+def get_total(items: List[Product], rate):
+    ...
+```
 
 The great thing about this is that if you have an old legacy code base that you want to add type checks to, you could do so gradually. You could start with a single library or even a single method within your code base and at least you know that you improved the readability of that specific piece by a little bit.
 
@@ -104,9 +109,10 @@ To get started with type hints in Python, you could just do so with the existing
 
 For example:
 
-	::python
-	def is_valid_path(path: str) -> bool:
-		return True
+```python
+def is_valid_path(path: str) -> bool:
+    return True
+```
 
 But what about other more advanced types? For example, let's say you want to annotate an argument which is a list of items. You could simply use the `var: list` annotation, but that doesn't really give us the full picture does it? What type of items is the list made up of?
 
@@ -116,9 +122,10 @@ This is where the [Python Typing Library](https://docs.python.org/3/library/typi
 
 For example, we could use the `typing.List` type to give us the ability to not just type hint that an argument is a list, but also what type of objects our list contains. 
 
-	::python
-	def words_to_ord(words: List[str]) -> List[int]:
-		return [ord(word) for word in words]
+```python
+def words_to_ord(words: List[str]) -> List[int]:
+    return [ord(word) for word in words]
+```
 
 Some of the other types that the library contains that helps us give a better and more detailed image of our variables are:
 
@@ -143,14 +150,15 @@ This is unlike `object` where it's true that every type is an `object`, but `obj
 
 For example:
 
-	::python
-	# Valid
-	def foo(item: Any):
-		item.write("Hello World")
-	
-	# Invalid
-	def bar(item: object):
-		item.write("Hello World")
+```python
+# Valid
+def foo(item: Any):
+    item.write("Hello World")
+
+# Invalid
+def bar(item: object):
+    item.write("Hello World")
+```
 
 It's true that any item we pass in is an `object`, but that does not mean that `object` has a `write()` method.
 
@@ -168,9 +176,10 @@ Other Type Checkers that have been created are:
 
 My own personal choice is to use `mypy` with `flake8`. It does not only give me the ability to do static analysis of my type hints, but it also allows me to lint my code and shows any style errors that might have been introduced. It covers all my needs when it comes to maintaining a clean code base.
 
-	::bash
-	pip install flake8 flake8-mypy
-	flake8 .
+```bash
+pip install flake8 flake8-mypy
+flake8 .
+```
 
 ## Type Annotation Syntax
 The core part of type hints in Python is to annotate your variables, arguments or methods with Type Annotations. The base syntax for this is to use the `:` character followed by the type. E.g. `foo: str = "Hello World"`.
@@ -180,12 +189,13 @@ You can add type hints to both function arguments, function return types and var
 ### Function Annotation
 One of the most common places to add type annotations to will be the functions in your code. You can both add type hints to the arguments, but also to the return type of the function.
 
-	::python
-	from typing import List
+```python
+from typing import List
 
 
-	def reverse(words: List[str]) -> List[str]:
-		return words[::-1]
+def reverse(words: List[str]) -> List[str]:
+    return words[::-1]
+```
 
 As you can see, in the example above we annotate our `words` function parameter to be a list of strings. We also add an annotation of our return type using the `->` arrow syntax to hint that our method also returns a list of strings.
 
@@ -194,15 +204,17 @@ As I mentioned in previous sections of this article, Python uses gradual typing 
 #### Type Hint None or Void Return Types
 Many other programming languages have the concept of void methods. Void methods are methods that don't return anything at all like the following example.
 
-	::python
-	def save(file):
-		file.save()
+```python
+def save(file):
+    file.save()
+```
 
 All our `save()` method does is that it executes an action. It doesn't return any value back to the caller, so this is what we could call a `void` method in general programming terminology. So how do we hint this in Python? We use the `None` type.
 
-	::python
-	def save(file) -> None:
-		file.save()
+```python
+def save(file) -> None:
+    file.save()
+```
 
 Obviously assigning the return value of this function to a variable wouldn't make sense, because it doesn't return anything. Without type hints, we would not automatically discover this, but writing something like `res = save(f)` would now give us an error and inform us that the function doesn't have any return value.
 
@@ -213,18 +225,19 @@ The `typing` library offers us a great tool that will help us out with this in t
 
 For example:
 
-	::python
-	from typing import Optional
-	from .models import User
+```python
+from typing import Optional
+from .models import User
 
 
-	def foo(path: str, user: Optional[User] = None) -> Optional[int]:
-		# Do something...
-		...
-		if user:
-			return user.id
-		else:
-			return None
+def foo(path: str, user: Optional[User] = None) -> Optional[int]:
+    # Do something...
+    ...
+    if user:
+        return user.id
+    else:
+        return None
+```
 
 In the example above we use type annotations to hint that the `path` argument is always set to a `str` type, while the `user` argument is sometimes set to a `User` type but other times it might be set to `None`.
 
@@ -237,23 +250,25 @@ Functions are not the only case where it can be useful to use type hints. We mig
 
 With variable type hints, we can choose if we want to annotate the variables separately from the assignment, or at the same time. For example, in the code block below we are assigning `self.id` and `self.username` on multiple different locations, it might be cleaner to just type hint them a single time instead of having to repeat it everywhere they can be assigned.
 
-	::python
-	class User(object):
-		id: int
-		username: str
+```python
+class User(object):
+    id: int
+    username: str
 
-		def register(self, username: str) -> None:
-			self.id = self.get_latest_id()
-			self.username = username
-		
-		def get_existing(self, user) -> None:
-			self.id = user.id
-			self.username = user.username
+    def register(self, username: str) -> None:
+        self.id = self.get_latest_id()
+        self.username = username
+    
+    def get_existing(self, user) -> None:
+        self.id = user.id
+        self.username = user.username
+```
 
 However, we can also combine the type annotation with the assignment in the following manner:
 
-	::python
-	username: str = "weeman"
+```python
+username: str = "weeman"
+```
 
 ### Comment Annotation
 The syntax and tools required to add type hints to arguments, variables or function return values were added during Python 3.5 and Python 3.6. But what if you want to add type hints to older Python code?
@@ -262,10 +277,11 @@ The type checker `mypy` is a program written in Python 3, but all it does is tha
 
 Unfortunately, you can't use the `:` or the `->` syntax. Instead, you have to annotate your code using comments. 
 
-	::python
-	def calculate(a, b, c):
-		# type: (int, int, int) -> int
-		return a+b*c
+```python
+def calculate(a, b, c):
+    # type: (int, int, int) -> int
+    return a+b*c
+```
 
 That `# type: ` comment would then tell our type checker that the `calculate()` method has 3 arguments of type `int` and it also returns an `int` value.
 
@@ -274,39 +290,42 @@ This can be incredibly useful if you're working on a legacy code base or if you 
 ## Type Aliases
 Sometimes we might have some really complicated types. For example, imagine that we pass in a list of connection parameters to our method.
 
-	::python
-	def connect(connections) -> None:
-		...
+```python
+def connect(connections) -> None:
+    ...
 
-	connect(connections=[
-		(
-			("psql://", "hostname.com", 5432, ),
-			("username", "password", ),
-		), 
-		(
-			("http://", "hostname.com", 80, ),
-			("username", "password", ),
-		),  
-	])
+connect(connections=[
+    (
+        ("psql://", "hostname.com", 5432, ),
+        ("username", "password", ),
+    ), 
+    (
+        ("http://", "hostname.com", 80, ),
+        ("username", "password", ),
+    ),  
+])
+```
 
 We would then have to annotate our `connect()` function in the following manner:
 
-	::python
-	from typing import List, Tuple
+```python
+from typing import List, Tuple
 
-	def connect(connections: List[Tuple[Tuple[str, str, int], Tuple[str, str]]]):
-		...
+def connect(connections: List[Tuple[Tuple[str, str, int], Tuple[str, str]]]):
+    ...
+```
 
 Ouch right? For these situations, Python offers us something called "Type Aliases". A Type alias is basically just a reference to a type definition. We could then rewrite our `connect()` type annotations to the following.
 
-	::python
-	from typing import List, Tuple
-	Host = Tuple[str, str, int]
-	Credentials = Tuple[str, str]
-	Connection = Tuple[Host, Credentials]
+```python
+from typing import List, Tuple
+Host = Tuple[str, str, int]
+Credentials = Tuple[str, str]
+Connection = Tuple[Host, Credentials]
 
-	def connect(connections: List[Connection]):
-		...
+def connect(connections: List[Connection]):
+    ...
+```
 
 That small change greatly improved the readability, while still giving us the full power of type hints and checks for our method.
 

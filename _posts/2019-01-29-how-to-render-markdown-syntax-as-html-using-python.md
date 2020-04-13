@@ -29,19 +29,21 @@ It quite quickly becomes tiresome and prone to mistakes and bugs, and it might l
 ## How to Use Markdown Syntax with Python
 For most things you can think of, there is a python library available for it. So is naturally also the case for Markdown. There is a library called [Python-Markdown](https://python-markdown.github.io) that can easily be installed with `pip` using the following command:
 
-	::bash
-	# Note that there might be a later release
-	# available at the time of you reading this.
-	pip install markdown==2.6.11
+```bash
+# Note that there might be a later release
+# available at the time of you reading this.
+pip install markdown==2.6.11
+```
 
 The library offers multiple useful methods and tools for when it comes to working with strings that are formatted using Markdown Syntax. For example, we can easily turn Markdown into HTML with a single method call.
 
-	::python
-	from markdown import markdown
-	
+```python
+from markdown import markdown
 
-	markdown("# Hello World")
-	# <h1>Hello World</h1>
+
+markdown("# Hello World")
+# <h1>Hello World</h1>
+```
 
 The Markdown library also comes with the ability to add different types of extensions that modify the behavior or the way that markdown parse the Markdown Syntax. For example, you can modify how lists are parsed using the [Sane Lists extension](https://python-markdown.github.io/extensions/sane_lists/), or you can add code highlights of any `<code>` block using the [CodeHilite extension](https://python-markdown.github.io/extensions/code_hilite/).
 
@@ -50,13 +52,15 @@ So let's illustrate how you can activate an extension for the `markdown` library
 
 If we don't install any extension, code blocks are generated in the following manner:
 
-	::python
-	print("Hello World")
+```python
+print("Hello World")
+```
 
 Gets rendered as:
 
-	::html
-	<code>print("Hello World")</code>
+```html
+<code>print("Hello World")</code>
+```
 
 So technically, it works. It does understand that it is a code block and it wraps it as a `<code>` element. But what if we want to add highlights so that different syntax is colored in different colors, to improve the readability for the visitors that come to read our articles?
 
@@ -64,39 +68,43 @@ We might want to wrap the `print(` part with a `<span style="color: #ff0000;">` 
 
 To be able to enable the extension, we first have to install its dependency `Pygments`. Pygments is a popular syntax highlighter written in python and it is what takes care of the bulk of the work that the CodeHilite extension does. We can install it using `pip`.
 
-	::bash
-	# Note that a more recent version might
-	# have been released when you're reading this.
-	pip install Pygments>=2.3.1
+```bash
+# Note that a more recent version might
+# have been released when you're reading this.
+pip install Pygments>=2.3.1
+```
 
 To enable the CodeHilite extension, all we have to do is to add the `extensions` kwarg to our `markdown()` call that turn our Markdown Syntax into HTML.
 
-	::python
-	content = """
-	    ::python
-	    print("Hello World")	
-	"""
-	markdown(content, extensions=['codehilite'])
+```python
+content = """
+    ::python
+    print("Hello World")	
+"""
+markdown(content, extensions=['codehilite'])
+```
 
 This then wraps our code into the following HTML syntax:
 
-	::html
-	<div class="codehilite">
-		<pre>
-			<span></span>
-			<span class="k">print</span>
-			<span class="p">(</span>
-			<span class="s2">&quot;Hello World&quot;</span>
-			<span class="p">)</span>\n
-		</pre>
-	</div>
+```html
+<div class="codehilite">
+    <pre>
+        <span></span>
+        <span class="k">print</span>
+        <span class="p">(</span>
+        <span class="s2">&quot;Hello World&quot;</span>
+        <span class="p">)</span>\n
+    </pre>
+</div>
+```
 
 But obviously, just wrapping things in `<span>` elements doesn't do much. What does `class="k"` or `class="p"` even mean? Where are those styles defined? Well for this we have to import a CSS stylesheet that defines all of the style rules required.
 
 To do this, we can either generate our own styles which are documented in the [CodeHilite Documentation](https://python-markdown.github.io/extensions/code_hilite/#step-2-add-css-classes) by using the following command:
 
-	::bash
-	pygmentize -S default -f html -a .codehilite > styles.css
+```bash
+pygmentize -S default -f html -a .codehilite > styles.css
+```
 
 The command will generate a `styles.css` file for us that is populated with style rules that expect the code highlighting to be wrapped in a container with the `.codehilite` class. 
 
@@ -117,37 +125,40 @@ BeautifulSoup4 is a super popular library that gives the developer an amazing se
 
 We can install BeautifulSoup4 using `pip`.
 
-	::bash
-	# Note that a more recent version might 
-	# have been released at the time you read this.
-	pip install beautifulsoup4>=4.7.1
+```bash
+# Note that a more recent version might 
+# have been released at the time you read this.
+pip install beautifulsoup4>=4.7.1
+```
 
 We are then ready to use it in our code by importing it as:
 
-	::python
-	from bs4 import BeautifulSoup
+```python
+from bs4 import BeautifulSoup
+```
 
 ### Use BeautifulSoup to Modify HTML In-Place
 So let's take the example that we used in the section above regarding modifying `<a>` elements and add things such as `target="_blank"` or `rel="nofollow"` attributes to it.
 
 Here's an example of how this could be achieved:
 
-	::python
-	from bs4 import BeautifulSoup
-	from markdown import markdown
+```python
+from bs4 import BeautifulSoup
+from markdown import markdown
 
 
-	def render(content):
-		"""Render Markdown Syntax to final HTML."""
-		soup = BeautifulSoup(markdown(content, extensions=['codehilite']))
-		_add_a_attrs(soup)
-		return soup.prettify()
+def render(content):
+    """Render Markdown Syntax to final HTML."""
+    soup = BeautifulSoup(markdown(content, extensions=['codehilite']))
+    _add_a_attrs(soup)
+    return soup.prettify()
 
-	def _add_a_attrs(soup):
-		"""Add HTML attrs to our link elements"""
-		for tag in soup.find_all("a"):
-			tag['rel'] = "nofollow"
-			tag['target'] = "_blank"
+def _add_a_attrs(soup):
+    """Add HTML attrs to our link elements"""
+    for tag in soup.find_all("a"):
+        tag['rel'] = "nofollow"
+        tag['target'] = "_blank"
+```
 
 This will then do the following things:
 

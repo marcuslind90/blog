@@ -12,14 +12,15 @@ You might be running your containers using Docker Compose and a `docker-compose.
 
 Your `docker-compose.yml` file might look like this:
 
-	::yml
-	version: '3'
-	
-	services:
-		app:
-			image: username/app:d7s8f12
-			ports:
-				- 80:80
+```yml
+version: '3'
+
+services:
+    app:
+        image: username/app:d7s8f12
+        ports:
+            - 80:80
+```
 
 Each time your tag updates, you might want the hash `d7s8f12` to update to the latest tag. How is this achieved? Using `latest` tag is generally considered bad practice because it makes it difficult for you to have a good understanding of what version of your code that is running at any given time. So we want to manually inject our latest tag into our Compose file.
 
@@ -30,9 +31,10 @@ By using `sed` you can automatically update your `docker-compose.yml` file durin
 
 Here's an example of how to use `sed`:
 
-	::bash
-	sed -E -i'' "s/(.*app:).*/\1$COMMIT/" 'docker-compose.yml' 
-	
+```bash
+sed -E -i'' "s/(.*app:).*/\1$COMMIT/" 'docker-compose.yml' 
+```
+
 Let's summarize what we're doing with this command:
 
 - `-E` flag allows us to use extended regular expressions.
@@ -48,26 +50,27 @@ Another way you can easily update the contents of your `.yml` or `.json` file th
 
 To write a Python script that reads in a `.yml` file, update its contents and then save it, you can achieve that with the following script:
 
-	::python
-	import os
-	import yaml
+```python
+import os
+import yaml
 
 
-	if __name__ == "__main__":
+if __name__ == "__main__":
 
-		path = os.path.dirname(__file__)
+    path = os.path.dirname(__file__)
 
-		# Read in compose file
-		input_path = "{}{}".format(path, "docker-compose.yml")
-		contents = yaml.load(open(input_path).read())
+    # Read in compose file
+    input_path = "{}{}".format(path, "docker-compose.yml")
+    contents = yaml.load(open(input_path).read())
 
-		# Update image string value to the latest tag.
-		contents["services"]["app"]["image"] = f"app:{os.environ.get('COMMIT')}"
+    # Update image string value to the latest tag.
+    contents["services"]["app"]["image"] = f"app:{os.environ.get('COMMIT')}"
 
-		# Save file
-		output_path = "{}{}".format(path, "outputs/docker-compose.yml")
-		with open(output_path, mode="wb") as file:
-			file.write(yaml.dump(contents, default_flow_style=False))
+    # Save file
+    output_path = "{}{}".format(path, "outputs/docker-compose.yml")
+    with open(output_path, mode="wb") as file:
+        file.write(yaml.dump(contents, default_flow_style=False))
+```
 
 You could then run it by just executing `python script.py`.
 
@@ -78,14 +81,15 @@ However, this requires the system that runs the `docker-compose.yml` file to hav
 
 The way you could use the environment variable directly in your file would be to rewrite it in the following manner:
 
-	::yml
-	version: '3'
-	
-	services:
-		app:
-			image: username/app:${COMMIT}
-			ports:
-				- 80:80
+```yml
+version: '3'
+
+services:
+    app:
+        image: username/app:${COMMIT}
+        ports:
+            - 80:80
+```
 
 Each time you run `docker-compose up` the system would automatically inject the value of the `$COMMIT` environment variable into the container definition and pull down the correct tag. 
 

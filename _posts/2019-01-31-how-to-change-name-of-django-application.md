@@ -42,16 +42,18 @@ In a large code base, this might save you a ton of time! Be careful though, if y
 
 For example, imagine that you have a Django app named `core` and you want to rename it to `myapp`. Let's then say that you have the following code somewhere in your code base.
 
-	::python
-	from django.core.files.storages import default_storage
-	from core.models import MyCustomModel
-	...
+```python
+from django.core.files.storages import default_storage
+from core.models import MyCustomModel
+...
+```
 
 PyCharm **might** then rewrite both of these import statements to
 
-	::python
-	from django.myapp.files.storags import default_storage
-	from myapp.models import MyCustomModel
+```python
+from django.myapp.files.storags import default_storage
+from myapp.models import MyCustomModel
+```
 
 This rarely happens, but it is something worth to look out for.
 
@@ -90,15 +92,17 @@ Anytime you add applications and run migrations, this table adds references to t
 
 The main query you need to run is the following:
 
-	::sql
-	UPDATE django_content_type SET app_label='<NewAppName>' WHERE app_label='<OldAppName>';
+```sql
+UPDATE django_content_type SET app_label='<NewAppName>' WHERE app_label='<OldAppName>';
+```
 
 Obviously, you should replace the `<NewAppName>` and the `<OldAppName>` with your own names to be able to run the query successfully. What this query does is that it simply updates all the lines within the table that contain your old app name as the `app_label`, to the new app name.
 
 If you have updated any model names within your application, you will also be forced to run a second query to update the `name` field of each row within the `django_content_type` table.
 
-	::sql
-	UPDATE django_content_type SET name='<newModelName>' where name='<oldModelName>' AND app_label='<OldAppName>'
+```sql
+UPDATE django_content_type SET name='<newModelName>' where name='<oldModelName>' AND app_label='<OldAppName>'
+```
 
 Once again, you should obviously replace the `<newModelName>`, `<oldModelName>` and `<OldAppName>` with your own versions for the query to be executed.
 
@@ -107,15 +111,16 @@ If you have any Models in your application (which you probably do) it is fairly 
 
 For example, if our `foo` application has a `bar` model within it, the automatic table name would become `foo_bar`. You can also set this to some explicit value by updating the `Meta` class of your model in the following manner:
 
-	::python
-	from django.db import models
+```python
+from django.db import models
 
-	
-	class Bar(models.Model):
-		...
 
-		class Meta:
-			db_table = "custom_bar"
+class Bar(models.Model):
+    ...
+
+    class Meta:
+        db_table = "custom_bar"
+```
 
 So when it comes to making your models work properly after you've updated the app name, you have 2 options:
 
@@ -126,8 +131,9 @@ Personally, I prefer the second option, because it makes sense that things are n
 
 The query used to update table names are the following:
 
-	::sql
-	ALTER TABLE old_app_model_name RENAME TO new_app_model_name;
+```sql
+ALTER TABLE old_app_model_name RENAME TO new_app_model_name;
+```
 
 You will need to run one of these queries for each of the model tables that you have. To get a list of all your table names you can connect to your database and run `\dt` on PostgreSQL or `desc tables;` on MySQL to get a full list of tables in your database.
 
@@ -140,8 +146,9 @@ The migration table in the database contains references to which application tha
 
 This can be achieved with the following query:
 
-	::sql
-	UPDATE django_migrations SET app='<NewAppName>' WHERE app='<OldAppName>'
+```sql
+UPDATE django_migrations SET app='<NewAppName>' WHERE app='<OldAppName>'
+```
 
 ### 6. Rename Namespaced Folder Names in Static or Template Folders
 A common practice in Django is to namespace any static or template file that you have in your application with the name of the application itself. This is done by putting all the files within a directory named by the application.

@@ -24,8 +24,9 @@ I've worked as a professional software engineer for 10+ years, and every single 
 ## How to use Logging
 The `logging` module in Python is a core module in the language. It is always available and you don't need to install it from any remote package repository. You simply import it, and its ready to be used.
 
-	::python
-	import logging
+```python
+import logging
+```
 
 To understand how logging works and how to configure it, we have to understand a few key pieces.
 
@@ -40,14 +41,15 @@ A Python `Logger` is the object that is responsible for creating log entries. It
 
 A `Logger` has a name, and a code base can contain many different loggers. For example, imagine that we have the following modules in our code base:
 
-    ::bash
-    ./
-        apps/
-            foo/
-                app.py
-            bar/
-                app.py
-        main.py
+```bash
+./
+    apps/
+        foo/
+            app.py
+        bar/
+            app.py
+    main.py
+```
 
 In this case, let's say that each `app.py` file within our code base has their own `Logger` defined. Each Logger might be named with the path to the file. For example `apps.foo.app`, `apps.bar.app`.
 
@@ -55,9 +57,10 @@ By naming our loggers like this, we can later target the configuration to a spec
 
 This naming convention is the standard way to name your loggers, and its usually done by using the `__name__` variable in python when we initiate our Logger. It will then automatically pick up the execution path of your file as the name of the Logger.
 
-    ::python
-    import logging
-    logger = logging.getLogger(__name__)
+```python
+import logging
+logger = logging.getLogger(__name__)
+```
 
 ### LogRecords
 A `LogRecord` is just the object that represents each log message/entry/record (All of it is common terminology for the same thing). It holds the information about the log entry such as its Time, Message, Level and other metadata about the log record.
@@ -66,8 +69,9 @@ The `LogRecord` by itself does not take any consideration into how the final log
 
 When you write something like the following:
 
-	::python
-	logger.debug("This is a debug message")
+```python
+logger.debug("This is a debug message")
+```
 
 What you actually do is that you create a `LogRecord` for the Logger.
 
@@ -78,13 +82,14 @@ We don't need to manually do that to the log message itself, remember that `LogR
 
 We could create a `Formatter` in the following way:
 
-	::python
-	import logging
+```python
+import logging
 
-	formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-	
-	# logger.debug("This is a debug message")
-	# 2019-01-27 18:01:18,771 - __main__ - DEBUG - This is a debug message
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
+# logger.debug("This is a debug message")
+# 2019-01-27 18:01:18,771 - __main__ - DEBUG - This is a debug message
+```
 
 One great thing about Formatters is that you can also define different formatters to be used by different Handlers. You could output a more minified version of your `LogRecord` to Handler A, while you include additional metadata to Handler B. 
 
@@ -124,16 +129,17 @@ Each level indicates if the error message is simply just "Debugging information"
 
 You write log messages for each level in the following way:
 
-    ::python
-    import logging
+```python
+import logging
 
-    logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
-    logger.debug("This is a debug message.")
-    logger.info("This is an info message.")
-    logger.warning("This is a warning message.")
-    logger.error("This is an error message.")
-    logger.critical("This is a critical error message.")
+logger.debug("This is a debug message.")
+logger.info("This is an info message.")
+logger.warning("This is a warning message.")
+logger.error("This is an error message.")
+logger.critical("This is a critical error message.")
+```
 
 Each log message will automatically be stored in its correct level based on the method used whenever you log the message. But where will the Log Records be output in the example above? And which format will each log entry use?
 
@@ -152,14 +158,15 @@ The most commonly used method to configure logging is to use the `dictConfig`. T
 ### Use BasicConfig
 To quickly get going with logging you can simply use the `logging.basicConfig` method. By doing that you can simply define your settings with a single line of code.
 
-	::python
-	import logging
-	
+```python
+import logging
 
-	logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-	logger = logging.getLogger(__name__)
-	logger.debug("Hello World!")
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+logger = logging.getLogger(__name__)
+logger.debug("Hello World!")
+```
 
 Here we just define a `format` kwarg of our config and we are now ready to output our log records with a `StreamHandler` to the terminal. Note that the configuration is set on the `logging` level, and it will be set globally throughout our whole app.
 
@@ -170,23 +177,24 @@ Instead of providing a configuration that will be used for all loggers, we could
 
 This is not really recommended and its rarely used, but it allows us to see how things are connected between each other.
 
-	::python
-	import logging
+```python
+import logging
 
-	
-	logger = logging.getLogger(__name__)
 
-	# Create handler
-	handler = logging.StreamHandler()
+logger = logging.getLogger(__name__)
 
-	# Create formatter and add it to handler
-	format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-	handler.setFormatter(format)
+# Create handler
+handler = logging.StreamHandler()
 
-	# Add handler to the logger
-	logger.addHandler(handler)
+# Create formatter and add it to handler
+format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(format)
 
-	logger.debug('This is a debug')
+# Add handler to the logger
+logger.addHandler(handler)
+
+logger.debug('This is a debug')
+```
 
 These assignments will not be reused by other loggers that might be part of other files within our code base. Because of this, it's not a very "DRY" method of configuring our `Logger` and it's therefor not recommended.
 
@@ -197,35 +205,36 @@ Not only does this make things very explicit and clear, but it's also DRY and it
 
 Here's an example of how you can provide a dictionary as a config for your python logging module.
 
-	::python
-	import logging
-	import logging.config
+```python
+import logging
+import logging.config
 
-	logging.config.dictConfig({
-		'version': 1,
-		'formatters': {
-			'minimum': {
-				'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-			}
-		},
-		'handlers': {
-			'stream': {
-				'class': 'logging.StreamHandler',
-				'formatter': 'minimum',
-				'level': 'DEBUG',
-			}
-		},
-		'loggers': {
-			'apps': {
-				'handlers': ['stream', ],
-				'level': 'DEBUG',
-				'propagate': True,
-			}
-		}
-	})
-	logger = logging.getLogger(__name__)
+logging.config.dictConfig({
+    'version': 1,
+    'formatters': {
+        'minimum': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        }
+    },
+    'handlers': {
+        'stream': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'minimum',
+            'level': 'DEBUG',
+        }
+    },
+    'loggers': {
+        'apps': {
+            'handlers': ['stream', ],
+            'level': 'DEBUG',
+            'propagate': True,
+        }
+    }
+})
+logger = logging.getLogger(__name__)
 
-	logger.debug('This is a debug')
+logger.debug('This is a debug')
+```
 
 Let's summarize what we're doing here with this config:
 

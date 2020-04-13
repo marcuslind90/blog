@@ -33,18 +33,20 @@ Django automatically enumerates the migration files that it generates by prepend
 
 For example, imagine that we have a list of the following migration files.
 
-	::bash
-	./foo
-		./migrations
-			0001_initial.py
-			0002_userprofile.py
-			0003_article_user.py
-			0004_auto_20190101_0123.py
+```bash
+./foo
+    ./migrations
+        0001_initial.py
+        0002_userprofile.py
+        0003_article_user.py
+        0004_auto_20190101_0123.py
+```
 
 In many cases, we might just want to attempt to merge all of them. We could do this by executing the following management command.
 
-	::bash
-	python manage.py squashmigrations foo 0004
+```bash
+python manage.py squashmigrations foo 0004
+```
 
 `0004` refer to the prefixed number of the migration files and the result of the command is that it attempts to squash all the migrations from 0001 up until 0004. 
 
@@ -97,9 +99,10 @@ Normally when we want to generate a new migration we need to have some changes d
 
 We can simply use the `--empty` option to our `makemigrations` management command.
 
-	::bash
-	python manage.py makemigrations <app> --empty
-	
+```bash
+python manage.py makemigrations <app> --empty
+```
+
 By running that command we will now get a new migration file created in our `migrations` folder that automatically get some initial values, but with an empty list of operations to do. It will by default automatically add your latest migration (in our case it will be the squashed migration file) as a dependency.
 
 All you have to do now is move the operations/fields/actions that are causing the `CircularDepedencyError` from your squashed migration file to the list of operations of your new empty migration file.

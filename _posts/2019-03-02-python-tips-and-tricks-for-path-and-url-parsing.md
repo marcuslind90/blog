@@ -21,12 +21,13 @@ An incredibly common task is to concatenate strings to create a complete path, t
 
 For example:
 	
-	::python
-	path = "{}/{}/{}".format(
-		get_upload_path(),
-		"inputs",
-		file.name
-	)
+```python
+path = "{}/{}/{}".format(
+    get_upload_path(),
+    "inputs",
+    file.name
+)
+```
 
 Our intention in the code example above is to create a path that look something like `/static/files/inputs/myfile.png`. But can we really be sure that we will achieve this? What happens if `get_upload_path()` returns a path with a trailing slash?
 
@@ -38,10 +39,11 @@ To solve all of these things, I prefer using the `pathlib.Path` class.
 
 We could rewrite the code above to take advantage of `pathlib.Path` in the following manner:
 
-	::python
-	from pathlib import Path
+```python
+from pathlib import Path
 
-	path = Path(get_upload_path()) / "inputs" / file.name
+path = Path(get_upload_path()) / "inputs" / file.name
+```
 
 Do you agree with me that that's more readable? On top of that, the `Path` class will take care of things such as double slashes or other minor things that could cause unexpected behavior in our path.
 
@@ -52,9 +54,10 @@ Another common task is to parse a full path or URL to a file, and only want to g
 
 This is yet another thing that is commonly done manually in different ways:
 
-	::python
-	file_path: str
-	file_name = file_path.split("/")[-1]
+```python
+file_path: str
+file_name = file_path.split("/")[-1]
+```
 
 Once again, this is a fairly simple thing to do but there are definitely some edge cases that this snippet of code will not cover and questions to ask ourselves.
 
@@ -70,11 +73,12 @@ Finally the third point. I guess technically, as it is in the code example above
 
 All of this can be simplified with a single line of code:
 
-	::python
-	from pathlib import Path
+```python
+from pathlib import Path
 
-	file_name = Path(file_path).name  # myfile.png
-	file_stem = Path(file_path).stem  # myfile
+file_name = Path(file_path).name  # myfile.png
+file_stem = Path(file_path).stem  # myfile
+```
 
 Which alternative is more readable and take care of more edge cases? I think we can all agree that the `pathlib.Path` class simplifies this code by a lot, while also making it more readable and more robust.
 
@@ -83,9 +87,10 @@ One of the simplest, most reoccurring forms of validations when it comes to file
 
 Once again, the "common" way to get a file extension is by using `split()`
 
-	::python
-	file_path: str
-	file_ext = f".{file_path.split('.')[-1]}"  # .png
+```python
+file_path: str
+file_ext = f".{file_path.split('.')[-1]}"  # .png
+```
 
 Is that good enough? It might work for a normal case where we have something along the lines of `/file/myimage.png` but what about the edge cases?
 
@@ -96,20 +101,22 @@ In both these cases, the answer is that No these are not extensions, they are fi
 
 There are two built-in libraries in Python that can help us parsing the file extension of a file name. The first one is `os.path`
 
-	::python
-	import os
+```python
+import os
 
-	_, file_ext = os.path.splitext(file_path)
+_, file_ext = os.path.splitext(file_path)
+```
 
 Unlike our own code written above, the `splitext()` method will return `''` as file extensions for the edge cases described (which is correct!). The only "downside" to me is that it returns a tuple and I have to ignore the first part most of the time, which reduce the readability of the code slightly.
 
 The second library that we can use to get file extensions of files is once again our `pathlib.Path` class. It's just as easy as all the other examples of where this class has been used.
 
-	::python
-	from pathlib import Path
-	
-	file_path: str
-	file_ext = Path(file_path).suffix
+```python
+from pathlib import Path
+
+file_path: str
+file_ext = Path(file_path).suffix
+```
 
 This method also handles the edge cases that we described above in a perfect manner and is as robust as things could be. This is my preferred method do parsing of file extensions.
 
@@ -118,10 +125,11 @@ Technically you can use the `pathlib.Path` class described in the other sections
 
 For example, let's say that you want to get the file name to a path that is an URL and not just a file path:
 
-	::python
-	from pathlib import Path
-	path = Path("https://coderbook.com/files/file.png")
-	path.name  # file.png
+```python
+from pathlib import Path
+path = Path("https://coderbook.com/files/file.png")
+path.name  # file.png
+```
 
 But what about parsing other sections of the URL? For example, let's say you want to get the scheme, hostname or the path of an URL? For this, `pathlib` is not the correct tool in your toolbox. 
 
@@ -129,13 +137,14 @@ This is where `urllib` comes in! As you can see from the name of the two modules
 
 Using the `urllib.parse.urlparse` function we can easily parse a full URL to its different sections.
 
-	::python
-	from urllib.parse.urlparse
+```python
+from urllib.parse.urlparse
 
-	sections = urlparse("https://coderbook.com/@marcus/blog-post/")
-	sections.scheme  # https
-	sections.netloc  # coderbook.com
-	sections.path  # /@marcus/blog-post/
+sections = urlparse("https://coderbook.com/@marcus/blog-post/")
+sections.scheme  # https
+sections.netloc  # coderbook.com
+sections.path  # /@marcus/blog-post/
+```
 
 This can be incredibly useful. On this exact website that you're reading this article right now, this is one of the methods that is used to determine if `<a>` tags within articles should have `rel="nofollow"` or not. We can identify hostnames easily and determine what are internal links, what are external links, and which hostnames that are trusted and deserve a follow link and which ones doesn't.
 
@@ -148,16 +157,16 @@ Technically, you could write your own script that maybe split things by `?` and 
 
 Instead, we can actually leverage the `urlparse` function used earlier together with the `parse_qs` function that is also part of the `urllib.parse` module.
 
-	::python
-	from typing import Dict, List
-	from urllib.parse import urlparse, parse_qs
+```python
+from typing import Dict, List
+from urllib.parse import urlparse, parse_qs
 
-	url: str
-	params: Dict[str, List]
+url: str
+params: Dict[str, List]
 
-	params = parse_qs(urllparse(url).query)
-	#  {"page": [1]}
-
+params = parse_qs(urllparse(url).query)
+#  {"page": [1]}
+```
 That's it! Way simpler than having to do all these weird splitting that is so common to see in different codebases.
 
 ## Conclusion

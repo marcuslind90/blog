@@ -89,15 +89,16 @@ The reason why these benefits are possible is because a Docker Container does no
 ### How to Define and Build a Docker Image
 The Docker Image is built by the definitions that you have written in what is called a `Dockerfile`. This file describes step by step what the Docker Builder should do as it is building your image. 
 
-    ::dockerfile
-    # Inherits from base image.
-    FROM python:3.7
-    ENV PYTHONUNBUFFERED 1
-    WORKDIR /app
-    # Install a system dependency.
-    RUN apt-get update && apt-get install -y foo
-    # Copy our source code into the container's work directory.
-    COPY ./src /app
+```dockerfile
+# Inherits from base image.
+FROM python:3.7
+ENV PYTHONUNBUFFERED 1
+WORKDIR /app
+# Install a system dependency.
+RUN apt-get update && apt-get install -y foo
+# Copy our source code into the container's work directory.
+COPY ./src /app
+```
 
 As you can see from the example above, the syntax for writing a Dockerfile is incredibly simple and easy to understand. There is no need for complex bash scripts that often can be seen in other places.
 
@@ -172,20 +173,21 @@ Decreasing the discrepancies between environments has a huge impact on reducing 
 ### Docker Compose Definition YAML File
 So how do you define which services that you want Docker Compose to create? It's done using a simple `docker-compose.yaml` file.
 
-    ::yaml
-    version: 3
-    services:
-        db:
-            image: postgres:9.6
-            restart: always
-            ports:
-                - "5432:5432"
+```yaml
+version: 3
+services:
+    db:
+        image: postgres:9.6
+        restart: always
+        ports:
+            - "5432:5432"
 
-        app:
-            image: meme:latest
-            restart: always
-            depends_on:
-                - db
+    app:
+        image: meme:latest
+        restart: always
+        depends_on:
+            - db
+```
 
 You can then execute this Docker Compose file using `docker-compose up` in the directory where the file is located. It will automatically pull down the images and execute them on the same network, which allows both of the containers to communicate with each other.
 

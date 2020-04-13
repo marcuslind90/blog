@@ -28,28 +28,29 @@ We replaced our custom code and since then we haven't looked back.
 ## Difference between Local and Remote Tasks
 Most projects are not distributed systems. Most projects just involve a single application with a single code repository. This makes it quite easy to import and execute Celery tasks in the following manner:
 
-	::python
-	from tasks.celery import app
-	
+```python
+from tasks.celery import app
 
-	@app.task
-	def sample_task(value):
-		print(value)
-	
-	sample_task.delay("Foo")
-	
+
+@app.task
+def sample_task(value):
+    print(value)
+
+sample_task.delay("Foo")
+```
+
 We can simply just import the `sample_task` function and add `.delay()` to it to invoke it as a background task that gets executed on our worker. But what if you don't have access to the code where the task is defined? What if it lives in a completely different repository and code base?
 
 In the case of a distributed system with multiple different applications and repositories, each repository might have its own Celer Worker and its own tasks. You can't use python to import the task from one code base to another.
 
 The way you call tasks in this situation is by its name in string format.
 
-	::python
-	from celery.tasks import app
-	
-	
-	app.send_task("sample_task", kwargs=dict(value="Foo"))
-	
+```python
+from celery.tasks import app
+
+app.send_task("sample_task", kwargs=dict(value="Foo"))
+```
+
 This results in the exact same action as the first example on top, but we don't require the actual function to be imported into our code. Instead we can just call it as a string. Note also that we can pass in any keyword arguments using the `kwargs={}` parameter.
 
 ## Route Tasks to Different Queues
@@ -66,26 +67,28 @@ Celery allows us to define `task_routes` where it will route messages to differe
 
 My own preference is to prefix each task name with the service or application name. E.g. instead of defining the task in the way we did in the first example, we could do it in the following manner.
 
-	::python
-	from tasks.celery import app
-	
-	
-	@app.task(name="web.sample_task")
-	def sample_task(value):
-		print(value)
-		
+```python
+from tasks.celery import app
+
+
+@app.task(name="web.sample_task")
+def sample_task(value):
+    print(value)
+```
+
 Notice that we added a `name=""` parameter to our task with a custom name that is prefixed with `web.`, which in this case would represent our Web Application.
 
 By doing this we could simply add a `task_routes` configuration that makes sure that all of the tasks that is prefixed with `web.` goes to the `web_queue`. 
 
-	::python
-	app = Celery("proj")
-	...
-	app.conf.task_routes = {
-		'web.*': {'queue': 'web_queue'}, 
-		'remote.*': {'queue': 'remote_queue'}, 
-	}
-	
+```python
+app = Celery("proj")
+...
+app.conf.task_routes = {
+    'web.*': {'queue': 'web_queue'}, 
+    'remote.*': {'queue': 'remote_queue'}, 
+}
+```
+
 If we then have a web worker that is listening to the `web_queue` queue, and a remote worker that is listening to the `remote_queue` queue, we would always be sure that the correct worker receive the correct message.
 
 ## Setting up a Result Backend
@@ -103,8 +106,9 @@ By doing this, it means that your client can determine what to do with the respo
 
 You define the `rpc` backend with the following configuration
 
-	::python
-	CELERY_RESULT_BACKEND = 'rpc'
+```python
+CELERY_RESULT_BACKEND = 'rpc'
+```
 
 ## Summary
 Throughout this article we have learned a few different things of how to properly setup Celery to work in a distributed system where we might have multiple different workers that process tasks that are spread out between multiple codebases. What we can learn from this is the following:

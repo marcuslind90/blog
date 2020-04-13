@@ -26,10 +26,11 @@ By installing `flake8-junit-report` with `pip` you can easily convert the output
 
 Run the commands in the following order:
 
-    ::bash
-    mkdir -p test-reports/flake8
-    flake8 . --output-file=test-reports/flake8/flake8.txt
-    flake8_junit test-reports/flake8/flake8.txt test-reports/flake8/flake8_junit.xml
+```bash
+mkdir -p test-reports/flake8
+flake8 . --output-file=test-reports/flake8/flake8.txt
+flake8_junit test-reports/flake8/flake8.txt test-reports/flake8/flake8_junit.xml
+```
 
 Let's recap what these commands actually do:
 
@@ -52,19 +53,21 @@ In the case of a normal python application you would use it in the following man
 
 Either simply by calling it in the command line:
 
-    ::bash
-    python -m xmlrunner discover -t ./tests -o ./test-reports/junit
+```bash
+python -m xmlrunner discover -t ./tests -o ./test-reports/junit
+```
 
 Or you could also make it part of a python script where you can have some additional flexibility:
 
-    ::python
-    if __name__ == '__main__':
-        unittest.main(
-            testRunner=xmlrunner.XMLTestRunner(output='test-reports'),
-            # these make sure that some options that are not applicable
-            # remain hidden from the help menu.
-            failfast=False, buffer=False, catchbreak=False
-        )
+```python
+if __name__ == '__main__':
+    unittest.main(
+        testRunner=xmlrunner.XMLTestRunner(output='test-reports'),
+        # these make sure that some options that are not applicable
+        # remain hidden from the help menu.
+        failfast=False, buffer=False, catchbreak=False
+    )
+```
 
 ### Generate JUnit Test Report with Django
 Unlike normal python projects, unit tests written in a Django project is normally executed with the `python manage.py test` command which is an internal Django management command. 
@@ -73,10 +76,11 @@ Luckily, the `unittest-xml-reporting` package comes with a Django TestRunner cla
 
 Simply add the following lines to your `settings.py` file within your Django project:
 
-    ::python
-    TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
-    TEST_OUTPUT_DIR = './test-reports/unittest'
-    TEST_OUTPUT_FILE_NAME = 'unittest.xml'
+```python
+TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
+TEST_OUTPUT_DIR = './test-reports/unittest'
+TEST_OUTPUT_FILE_NAME = 'unittest.xml'
+```
 
 Each time you run the `python manage.py test` command, it will now use the `XMLTestRunner` and generate a JUnit report at `./test-reports/unittest/unittest.xml`. 
 

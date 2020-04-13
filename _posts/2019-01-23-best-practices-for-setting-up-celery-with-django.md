@@ -17,30 +17,33 @@ Celery by itself is not dependent on Django. You can setup Celery with any kind 
 ## Installing Celery
 The first step you have to do is to install the Celery package using `pip`.
 
-	::bash
-	# Note that there might be a more recent
-	# version released when you're reading this.
-	pip install celery>=4.2.1
+```bash
+# Note that there might be a more recent
+# version released when you're reading this.
+pip install celery>=4.2.1
+```
 
 The next step would be to setup a file where we instantiate our `Celery` instance.
 Create the following file structure:
 
-	::bash
-	./
-		tasks/
-			__init__.py
-			celery.py
+```bash
+./
+    tasks/
+        __init__.py
+        celery.py
+```
 
 Start off by populating the `celery.py` file with the following information:
 
-	::python
-	import os
-	from celery import Celery
-	
-	os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
-	app = Celery("tasks")
-	app.config_from_object('django.conf:settings', namespace="CELERY")
-	app.autodiscover_tasks()
+```python
+import os
+from celery import Celery
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
+app = Celery("tasks")
+app.config_from_object('django.conf:settings', namespace="CELERY")
+app.autodiscover_tasks()
+```
 
 Let's summarize what we're doing here:
 
@@ -51,10 +54,11 @@ Let's summarize what we're doing here:
 
 The next step is to populate the `__init__.py` file with the following code, which will allow us to automatically import the `Celery` `app` instance that we defined.
 
-	::python
-	from .celery import app as celery_app
+```python
+from .celery import app as celery_app
 
-	__all__ = ("celery_app", )
+__all__ = ("celery_app", )
+```
 
 ### Configure Celery to use RabbitMQ
 In the previous step we informed Celery that it should load all of its configuration values from the default Django project settings with the caveat that all of the Celery specific configuration values should be prefixed with `CELERY_`.
@@ -75,14 +79,15 @@ I personally prefer to work with RabbitMQ and it is what I will use in this arti
 
 So let's tell Celery that it should send and read messages from a RabbitMQ Broker by adding the following to our Django Settings file:
 
-	::python
-	BROKER_USER = os.environ.get("BROKER_USER")
-	BROKER_PASSWORD = os.environ.get("BROKER_PASSWORD")
-	BROKER_HOST = os.environ.get("BROKER_HOST")
-	BROKER_PORT = os.environ.get("BROKER_PORT")
-	BROKER_VHOST = os.environ.get("BROKER_VHOST")
+```python
+BROKER_USER = os.environ.get("BROKER_USER")
+BROKER_PASSWORD = os.environ.get("BROKER_PASSWORD")
+BROKER_HOST = os.environ.get("BROKER_HOST")
+BROKER_PORT = os.environ.get("BROKER_PORT")
+BROKER_VHOST = os.environ.get("BROKER_VHOST")
 
-	CELERY_BROKER_URL=f"amqp://{BROKER_USER}:{BROKER_PASSWORD}@{BROKER_HOST}:{BROKER_PORT}/{BROKER_VHOST}"
+CELERY_BROKER_URL=f"amqp://{BROKER_USER}:{BROKER_PASSWORD}@{BROKER_HOST}:{BROKER_PORT}/{BROKER_VHOST}"
+```
 
 The key point here is the `CELERY_BROKER_URL`. It is the connection URL that we use for sending and reading messages. In our example its made up by variables that are read in from our system environment variables. In your own case you need to either define these environment variables, or replace each `os.environ.get` line with your own hard coded values.
 
@@ -91,8 +96,9 @@ The final part of setting up Celery is to actually execute and run the Celery Wo
 
 This is easily done with a single line of code that is executed in the terminal:
 
-	::bash
-	celery -A tasks worker -Q celery
+```bash
+celery -A tasks worker -Q celery
+```
 
 To summarize what this command does:
 
@@ -107,9 +113,10 @@ A problem with just using the command above when you're starting your Django app
 
 If you would start your application with the following command:
 
-	::bash
-	bash -c "celery -A tasks worker -Q celery && python manage.py runserver"
-	
+```bash
+bash -c "celery -A tasks worker -Q celery && python manage.py runserver"
+```
+
 Then the second command would never execute, because the `celery worker` command would never finish running. So what you want to do is to execute the Celery worker as a background job by itself on your system. 
 
 There are plenty of ways to Daemonize a command or executable in Linux and there might not be a single "correct" way. If you're already familiar with your own methods to do this then go ahead and do whatever you feel comfortable with.
@@ -121,35 +128,40 @@ A great benefit of this is that you can bundle all of this together with your ap
 #### Installing Supervisor
 As mentioned above, you can install supervisor using `pip`.
 
-	::bash
-	pip install supervisor>=3.3.5
+```bash
+pip install supervisor>=3.3.5
+```
 
 Note that at the time of writing this article, the supervisor package only work on Python2.7. Supervisor is currently working on releasing a version that will be running on Python3 and you can already use it by installing it directly from Github.
 
-	::bash
-	pip install git+https://github.com/Supervisor/supervisor
+```bash
+pip install git+https://github.com/Supervisor/supervisor
+```
 
 After you've installed it you have to create a config for it. You can get a default config by running the command `echo_supervisord_conf` after you've installed the package. This will write out a complete config into your terminal and you can copy it to your own `supervisord.conf` file in the root of your repository.
 
 At the end of this configuration file, we want to add the configuration that informs our Supervisor command that it should run our Celery Worker as a background task.
 
-	::bash
-	[program:celery]
-	command=celery -A tasks worker -Q celery
-	stdout_logfile = /tmp/celery.log
-	redirect_stderr=true
+```bash
+[program:celery]
+command=celery -A tasks worker -Q celery
+stdout_logfile = /tmp/celery.log
+redirect_stderr=true
+```
 
 Finally we need to run supervisor with the following command:
 
-	::bash
-	supervisord -c supervisord.conf
+```bash
+supervisord -c supervisord.conf
+```
 
 Note that the command is called `supervisord` unlike the package which is called `supervisor`. The `-c` flag allow us to define a file path to the `supervisord.conf` configuration file that it should use.
 
 This would then allow us to run our Django application by first starting `supervisord`, and then running our Django application.
 
-	::bash
-	bash -c "supervisord -c supervisord.conf && python manage.py runserver"
+```bash
+bash -c "supervisord -c supervisord.conf && python manage.py runserver"
+```
 
 A final note is to remember that during development, unlike Django's `runserver` command, Celery will not automatically pickup new code changes as they are saved. You need to restart the worker for it to find new tasks or changes to existing tasks.
 
@@ -158,13 +170,14 @@ Great job! At this point you're done with the installation of Celery and you sho
 
 Now its finally time to create a sample task that we can use to illustrate that its all working.
 
-	::python
-	from tasks.celery import app as celery_app
-	
-	
-	@celery_app.task(name="foobar.sample_task")
-	def sample_task(value):
-		print(value)
+```python
+from tasks.celery import app as celery_app
+
+
+@celery_app.task(name="foobar.sample_task")
+def sample_task(value):
+    print(value)
+```
 
 This code could live within any application that is loaded into your Django Settings `INSTALLED_APPS` list of applications. I suggest that you create a dedicated `tasks.py` for each application to separate the tasks to its own file and to easily keep track of them.
 
@@ -175,19 +188,20 @@ Finally we've arrived at the moment we've all been waiting for! Its time to call
 
 Let's say that we would like to call our `sample_task` from within a Django View.
 
-	::python
-	from django.views.generic import View
-	from django.http.response import JsonResponse
-	from foobar.tasks import sample_task
-	
-	
-	class SampleView(View):
-		def get(self, *args, **kwargs):
-			# Call our sample_task asynchronously with
-			# our Celery Worker!
-			sample_task.delay("Our printed value!")
+```python
+from django.views.generic import View
+from django.http.response import JsonResponse
+from foobar.tasks import sample_task
 
-			return JsonResponse(dict(status=200))
+
+class SampleView(View):
+    def get(self, *args, **kwargs):
+        # Call our sample_task asynchronously with
+        # our Celery Worker!
+        sample_task.delay("Our printed value!")
+
+        return JsonResponse(dict(status=200))
+```
 
 Now when we visit our `SampleView`, it should automatically send the task to our Worker and the Worker process should print out `"Our printed value!"`. 
 
@@ -200,11 +214,12 @@ Imagine that we have some task that perhaps upload some file for us. When the pr
 
 On the Task side its pretty simple. All you have to do is to return the data with a `return` statement. For example we could rewrite our task to the following:
 
-	::python
-	@celery_app.task(name="foobar.sample_task")
-	def sample_task(value):
-		return value
-		
+```python
+@celery_app.task(name="foobar.sample_task")
+def sample_task(value):
+    return value
+```
+
 Instead of printing the value we send to it, it will now simply pass it back to us. But that's not enough, we also have to tell Celery how it should pass back this information. We can do that by defining a result backend.
 
 ### Defining a Result Backend
@@ -219,21 +234,24 @@ What it does is that it provides a result backend for us, that will store things
 #### Installing Django Celery Results Backend
 The installation of Django Celery Results package is very simple and straight forward.
 
-	::bash
-	pip install django-celery-results>=1.0.4
+```bash
+pip install django-celery-results>=1.0.4
+```
 
 The next step is to add it to your `INSTALLED_APPS` setting so that Django knows about its models and how to represent them in the database.
 
-	::python
-	INSTALLED_APPS = [
-		...,
-		'django_celery_results',
-	]
+```python
+INSTALLED_APPS = [
+    ...,
+    'django_celery_results',
+]
+```
 
 Finally we have to define Celery's `RESULT_BACKEND` setting to use our new django-celery-results backend. Since we load our Django settings to our Celery app, we define this value within our `settings.py` file.
 	
-	::python
-	CELERY_RESULT_BACKEND = 'django-db'
+```python
+CELERY_RESULT_BACKEND = 'django-db'
+```
 
 Make sure that you run `python manage.py migrate` to migrate the package's models to your database and restart your application and worker. You should now be done with installing your Django Celery Results Backend!
 

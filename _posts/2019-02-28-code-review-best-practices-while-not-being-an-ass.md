@@ -83,9 +83,10 @@ There is no need to explain or excuse yourself, just get to the point.
 
 The more complicated cases are when there are some ambiguity involved. For example, let's take a look at the following example.
 
-	::python
-	def process(file: str):
-		pass
+```python
+def process(file: str):
+    pass
+```
 
 Are we passing in a file object or a file path? The naming indicates that there is a file being passed in, while the type hint indicates that perhaps it's a path to a file. Which one is it?
 

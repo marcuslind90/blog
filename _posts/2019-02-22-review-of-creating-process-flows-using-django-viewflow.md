@@ -21,29 +21,30 @@ Imagine that you have a graph with different paths between views. You might star
 
 By using Viewflows `Flow` class, we can map different handlers and views together by different conditions. It all ends up like a Form Wizard, but with more complex capabilities and without the need to necessarily finish the whole form in one go.
 
-	::python
-	from viewflow import flow
-	from viewflow.flow.views import CreateProcessView
-	from viewflow.base import this, Flow
-	from .views import CustomView
-	class FooFlow(Flow):
-		process_class = FooProcess
-		start = (
-			flow.Start(
-				CreateProcessView,
-				fields=["field_a", ]
-			)
-			.Permission("can_foo", auto_create=True)
-			.Next(this.second)
-		)
+```python
+from viewflow import flow
+from viewflow.flow.views import CreateProcessView
+from viewflow.base import this, Flow
+from .views import CustomView
+class FooFlow(Flow):
+    process_class = FooProcess
+    start = (
+        flow.Start(
+            CreateProcessView,
+            fields=["field_a", ]
+        )
+        .Permission("can_foo", auto_create=True)
+        .Next(this.second)
+    )
 
-		second = (
-			flow.View(CustomView)
-			.Permission("can_see_custom", auto_create=True)
-			.Next(this.end)
-		)
+    second = (
+        flow.View(CustomView)
+        .Permission("can_see_custom", auto_create=True)
+        .Next(this.end)
+    )
 
-		end = flow.End()
+    end = flow.End()
+```
 
 As you can see in the code example above, we can use the `Flow` class to map `start` to next go to `second` and then go to `end`. Obviously, this is a very simple example, but you can also add conditions and other complexities that split up the flow in multiple paths.
 
@@ -72,11 +73,12 @@ How do you keep track on actions done by users that has nothing to do with the a
 
 One way of doing it is simply to store it on the model like this:
 
-	::python
-	from django.db import models
-	
-	class Article(models.Model):
-		has_been_reviewed = models.BooleanField(default=False)
+```python
+from django.db import models
+
+class Article(models.Model):
+    has_been_reviewed = models.BooleanField(default=False)
+```
 
 The downside of this is that now we are putting view logic into our domain models. Pretty soon we will have a weird table that keep track on things that has nothing to do with the actual model. We want it to represent an `Article`, not represent the state of a Form.
 

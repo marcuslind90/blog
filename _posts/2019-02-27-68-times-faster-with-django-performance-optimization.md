@@ -74,12 +74,13 @@ A lot of these queries were duplicates, this could be because we have a list of 
 
 For example:
 
-	::python
-	from .models import Article
-	
-	articles = Article.objects.all()
-	for article in articles:
-		print(article.author.username)
+```python
+from .models import Article
+
+articles = Article.objects.all()
+for article in articles:
+    print(article.author.username)
+```
 
 Imagine that `article` contains 100 articles. For each article, we attempt to get the `.author` field which is a relation to the `User` object. What Django then actually does, is that it creates additional database queries to fetch this user.
 
@@ -92,12 +93,13 @@ Remember the last example above? We first do a query that loads 100 articles, an
 
 We could reduce all of this down to a **single query** by using `.select_related()`.
 
-	::python
-	from .models import Article
+```python
+from .models import Article
 
-	articles = Article.objects.all().select_related('author')
-	for article in articles:
-		print(article.author.username)
+articles = Article.objects.all().select_related('author')
+for article in articles:
+    print(article.author.username)
+```
 
 #### Only Work With Forward Relations
 The `select_related()` method has some limitations, you cannot use it to load ManyToMany relations, and you can also not use it for reverse relations except on `OneToOneField`.
@@ -125,27 +127,29 @@ Let's take the Category pages of this website as an example. We might have many 
 
 In this case, we don't necessarily care about the data, we just want to see if the Category has any articles related to it or not. In cases like this we should always use `.exists()`.
 
-	::python
-	# Good
-	if category.articles.all().exist():
-		print("Category has articles!"
+```python
+# Good
+if category.articles.all().exist():
+    print("Category has articles!"
 
-	# Bad
-	if len(category.articles.all()) > 0:
-		print("Category has articles!")
+# Bad
+if len(category.articles.all()) > 0:
+    print("Category has articles!")
 
-	# Bad
-	if category.articles.all():
-		print("Category has articles!")
+# Bad
+if category.articles.all():
+    print("Category has articles!")
+```
 
 What `.exists()` does is that it reduces the query and limits it to fetch as few items as necessary to validate if the query return any objects or not. This can greatly improve your query.
 
 ### Consider .first() vs [0]
 Let's say that you have a list of items returned from a query and you want to limit it to 1 and only get the first one. There are 2 ways of doing this which are incredibly similar.
 
-	::python
-	Category.objects.all().first()
-	Category.objects.all()[0]
+```python
+Category.objects.all().first()
+Category.objects.all()[0]
+```
 
 These queries generate almost the exact same query and they perform almost identical, however! I've noticed differences with using them in combination with `prefetch_related` and `select_related`. 
 
@@ -165,11 +169,12 @@ To enable Gzip compression on files stored using `django-storages`, all you have
 
 On top of this, I also add cache headers to each file controlled by `django-storages` to make sure that browser cache is enabled for all of my files. This means that the options I add to optimize my file delivery using this package is the following:
 
-	::python
-	AWS_IS_GZIPPED = True
-	AWS_S3_OBJECT_PARAMETERS = {
-		'CacheControl': 'max-age=86400',
-	}
+```python
+AWS_IS_GZIPPED = True
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+```
 
 That's it! This amazing module makes it incredibly easy for us to make sure that our assets are served in an optimal way.
 
@@ -178,11 +183,12 @@ What about the rest of our response? Obviously, the static asset files such as i
 
 Django has a GzipMiddleware that we can enable that then makes sure that the response itself is compressed using Gzip before it's delivered back to the client. This is a one-liner that you can add to your `MIDDLEWARE` list which is also a no-brainer.
 
-	::python
-	MIDDLEWARE = [
-		'django.middleware.gzip.GZipMiddleware',
-		...
-	]
+```python
+MIDDLEWARE = [
+    'django.middleware.gzip.GZipMiddleware',
+    ...
+]
+```
 
 It is recommended that you add the `GZipMiddleware` as early in your list of middlewares as possible, to make sure that it compresses as much data as possible.
 
@@ -220,9 +226,10 @@ Unfortunately, by default `sorl-thumbnail` convert all of the files that you use
 
 This results in that your uploaded PNG files might even **increase** in file size after you start using `sorl-thumbnail`. To take care of this you must use the following settings:
 
-	::python
-	THUMBNAIL_QUALITY = 85
-	THUMBNAIL_PRESERVE_FORMAT = True
+```python
+THUMBNAIL_QUALITY = 85
+THUMBNAIL_PRESERVE_FORMAT = True
+```
 
 The `THUMBNAIL_QUALITY` value is something that you might need to experiment with to determine the acceptable level. The lower value, the smaller size, but it will also make your files a lower quality.
 
