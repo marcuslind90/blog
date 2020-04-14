@@ -5,14 +5,22 @@ layout: default
 <article class="post">
   <h1 class="post-title">{{ page.title }}</h1>
   <time datetime="{{ page.date | date_to_xmlschema }}" class="post-date">{{ page.date | date_to_string }}</time>
-  {{ content }}
+
+  {% assign paragraphs = content|split: '</p>' %}
+  {% for p in paragraphs %}
+    {{p}}</p>
+    {% if forloop.index == 8 or forloop.last %}
+      {% include newsletter.html %}
+    {% endif %}
+  {% endfor %}
+  <!-- {{ content }} -->
 </article>
 
 {% if site.related_posts != empty %}
 <aside class="related">
   <h3>Related posts</h3>
   <ul class="related-posts">
-    {% for post in site.related_posts limit:3 %}
+    {% for post in site.related_posts limit:5 %}
       <li>
         <a href="{{ site.baseurl }}{{ post.url }}">
           {{ post.title }}

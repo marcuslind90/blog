@@ -1,0 +1,77 @@
+.btn {
+    border: 1px solid #73767a;
+    display: block;
+    padding: 20px 5px;
+    border-radius: 5px;
+    text-decoration: none;
+    text-align: center;
+    margin: 20px 0;
+}
+.svg-icon {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    fill: #828282;
+    vertical-align: text-top;
+}
+
+.newsletter {
+
+    margin: 40px 0;
+    padding: 20px;
+    border: 1px solid #ffb183;
+    border-radius: 5px;
+
+    .headline {
+        font-weight: 600;
+        line-height: 1.25;
+        font-size: 3rem;
+        margin-bottom: 20px;
+
+        @media(max-width: 500px) {
+            font-size: 2.1rem;
+        }
+    }
+
+    .form {
+        overflow: hidden;
+        input.email {
+            float: left;
+            width: 60%;
+            background: #fff;
+            padding: 10px 10px;
+            border-radius: 5px;
+            border: 1px solid #73767a;
+            font-size: 0.8rem;
+        }
+    
+        input.button {
+            float: right;
+            width: 35%;
+            border: none;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+            letter-spacing: .03em;
+            color: #343a40;
+            background-color: #feb082;
+            box-sizing: border-box;
+            height: 37px;
+            line-height: 39px;
+            padding: 0 18px;
+            display: inline-block;
+            margin: 0;
+            transition: all 0.23s ease-in-out 0s;
+            font-size: 0.8rem;        
+        }
+    }
+
+}
+
+.pagination-item:first-child {
+    margin-bottom: 0px;
+}
+
+.pagination-item {
+    width: 50%;
+}
