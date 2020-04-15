@@ -1,5 +1,6 @@
 ---
 layout: default
+hide_comments: false
 ---
 
 <article class="post">
@@ -31,3 +32,7 @@ layout: default
   </ul>
 </aside>
 {% endif %}
+
+{% unless page.hide_comments %}
+{% include disqus.html %}
+{% endunless %}
