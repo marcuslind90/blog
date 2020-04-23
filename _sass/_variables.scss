@@ -24,6 +24,7 @@
 
   --blue-300: #74c0fc;
   --blue-400: #4dabf7;
+  --blue-800: #2b343e;
   --yellow-100: #fff3bf;
 
   --body-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -52,7 +53,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --body-color: var(--gray-300);
-    --body-bg: var(--gray-800);
+    --body-bg: var(--blue-800);
 
     --heading-color: #fff;
 
