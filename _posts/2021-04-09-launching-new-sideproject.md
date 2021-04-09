@@ -19,7 +19,6 @@ I recently I launched a [real estate portal called Homest](https://homest.co.uk/
 How did I do this?
 
 
-Architecture of my web crawler application
-##########################################
+## Architecture of my web crawler application
 
-![Web crawler architecture diagram](/assets/crawler-architecture.png "Web crawler architecture")
+![Web crawler architecture diagram](/assets/architecture-diagram.png "Web crawler architecture")
